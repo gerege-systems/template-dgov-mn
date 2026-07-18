@@ -1,0 +1,22 @@
+# Government Template Platform V3.0 — root ignore (subdirs have their own .gitignore)
+
+# Secrets / local env (keep *.example tracked)
+.env
+.env.*
+!.env.example
+backend.env
+*.pem
+*.key
+
+# OS / editor junk
+.DS_Store
+.idea/
+.vscode/
+*.log
+
+# Build / deps (belt-and-suspenders; subdir ignores also cover these)
+node_modules/
+**/node_modules/
+frontend/.next/
+backend/bin/
+backend/tmp/
