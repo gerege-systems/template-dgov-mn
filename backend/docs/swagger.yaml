@@ -878,6 +878,12 @@ definitions:
         description: |-
           EID нь eID-ээр нэвтэрсэн хэрэглэгчийн identity + сертификатын мэдээлэл.
           Нууц үгээр бүртгүүлсэн хэрэглэгчид nil (omitempty).
+      eid_proxy:
+        description: |-
+          EIDProxy нь SSO eID proxy идэвхтэй эсэхийг заана — идэвхтэй бол иргэн
+          локал eID linkage-гүй (SSO-ээр нэвтэрсэн) байсан ч eID PKI самбарыг SSO-
+          гоор дамжуулан үзэж болно. Frontend eID хуудсуудыг үүгээр нээнэ.
+        type: boolean
       email:
         type: string
       first_name:
@@ -1141,6 +1147,12 @@ definitions:
         description: |-
           EID нь eID-ээр нэвтэрсэн хэрэглэгчийн identity + сертификатын мэдээлэл.
           Нууц үгээр бүртгүүлсэн хэрэглэгчид nil (omitempty).
+      eid_proxy:
+        description: |-
+          EIDProxy нь SSO eID proxy идэвхтэй эсэхийг заана — идэвхтэй бол иргэн
+          локал eID linkage-гүй (SSO-ээр нэвтэрсэн) байсан ч eID PKI самбарыг SSO-
+          гоор дамжуулан үзэж болно. Frontend eID хуудсуудыг үүгээр нээнэ.
+        type: boolean
       email:
         type: string
       first_name:
@@ -1191,6 +1203,12 @@ definitions:
         description: |-
           EID нь eID-ээр нэвтэрсэн хэрэглэгчийн identity + сертификатын мэдээлэл.
           Нууц үгээр бүртгүүлсэн хэрэглэгчид nil (omitempty).
+      eid_proxy:
+        description: |-
+          EIDProxy нь SSO eID proxy идэвхтэй эсэхийг заана — идэвхтэй бол иргэн
+          локал eID linkage-гүй (SSO-ээр нэвтэрсэн) байсан ч eID PKI самбарыг SSO-
+          гоор дамжуулан үзэж болно. Frontend eID хуудсуудыг үүгээр нээнэ.
+        type: boolean
       email:
         type: string
       first_name:
@@ -1298,6 +1316,12 @@ definitions:
         description: |-
           EID нь eID-ээр нэвтэрсэн хэрэглэгчийн identity + сертификатын мэдээлэл.
           Нууц үгээр бүртгүүлсэн хэрэглэгчид nil (omitempty).
+      eid_proxy:
+        description: |-
+          EIDProxy нь SSO eID proxy идэвхтэй эсэхийг заана — идэвхтэй бол иргэн
+          локал eID linkage-гүй (SSO-ээр нэвтэрсэн) байсан ч eID PKI самбарыг SSO-
+          гоор дамжуулан үзэж болно. Frontend eID хуудсуудыг үүгээр нээнэ.
+        type: boolean
       email:
         type: string
       first_name:

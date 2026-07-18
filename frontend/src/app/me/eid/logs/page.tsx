@@ -13,7 +13,7 @@ export default async function EidLogsPage() {
   return (
     <>
       <PageHead eyebrowKey="sys.user" titleKey="eid.logs.title" subKey="eid.logs.sub" />
-      <EidLogsView show={!!me.eid} />
+      <EidLogsView show={!!me.eid || !!me.eidProxy} />
     </>
   );
 }

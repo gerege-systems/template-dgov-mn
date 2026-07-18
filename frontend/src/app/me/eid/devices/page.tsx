@@ -13,7 +13,7 @@ export default async function EidDevicesPage() {
   return (
     <>
       <PageHead eyebrowKey="sys.user" titleKey="eid.devices.title" subKey="eid.devices.sub" />
-      <EidDevicesView show={!!me.eid} />
+      <EidDevicesView show={!!me.eid || !!me.eidProxy} />
     </>
   );
 }

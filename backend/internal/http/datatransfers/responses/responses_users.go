@@ -28,6 +28,10 @@ type UserResponse struct {
 	// EID нь eID-ээр нэвтэрсэн хэрэглэгчийн identity + сертификатын мэдээлэл.
 	// Нууц үгээр бүртгүүлсэн хэрэглэгчид nil (omitempty).
 	EID *EIDInfo `json:"eid,omitempty"`
+	// EIDProxy нь SSO eID proxy идэвхтэй эсэхийг заана — идэвхтэй бол иргэн
+	// локал eID linkage-гүй (SSO-ээр нэвтэрсэн) байсан ч eID PKI самбарыг SSO-
+	// гоор дамжуулан үзэж болно. Frontend eID хуудсуудыг үүгээр нээнэ.
+	EIDProxy bool `json:"eid_proxy,omitempty"`
 	// Google нь холбогдсон Google account-аас хадгалсан профайл. Google
 	// холбоогүй хэрэглэгчид nil (omitempty).
 	Google *GoogleInfo `json:"google,omitempty"`

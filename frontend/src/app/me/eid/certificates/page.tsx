@@ -13,7 +13,7 @@ export default async function EidCertificatesPage() {
   return (
     <>
       <PageHead eyebrowKey="sys.user" titleKey="eid.certs.title" subKey="eid.certs.sub" />
-      <EidCertificatesView show={!!me.eid} />
+      <EidCertificatesView show={!!me.eid || !!me.eidProxy} />
     </>
   );
 }

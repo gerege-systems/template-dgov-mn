@@ -26,6 +26,7 @@ export interface BackendUser {
   created_at: string;
   updated_at: string | null;
   eid?: BackendEID;
+  eid_proxy?: boolean;
   google?: BackendGoogle;
 }
 
@@ -102,6 +103,8 @@ export interface SessionUser {
   createdAt: string;
   updatedAt: string | null;
   eid?: EIDInfo;
+  /** SSO eID proxy идэвхтэй — локал eID linkage-гүй ч eID хуудсуудыг нээнэ. */
+  eidProxy?: boolean;
   google?: GoogleInfo;
 }
 
@@ -136,6 +139,7 @@ export function toSessionUser(u: BackendUser): SessionUser {
     createdAt: u.created_at,
     updatedAt: u.updated_at,
     eid: u.eid ? toEIDInfo(u.eid) : undefined,
+    eidProxy: u.eid_proxy ?? false,
     google: u.google ? toGoogleInfo(u.google) : undefined,
   };
 }

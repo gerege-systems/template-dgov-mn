@@ -6838,6 +6838,10 @@ const docTemplate = `{
                         }
                     ]
                 },
+                "eid_proxy": {
+                    "description": "EIDProxy нь SSO eID proxy идэвхтэй эсэхийг заана — идэвхтэй бол иргэн\nлокал eID linkage-гүй (SSO-ээр нэвтэрсэн) байсан ч eID PKI самбарыг SSO-\nгоор дамжуулан үзэж болно. Frontend eID хуудсуудыг үүгээр нээнэ.",
+                    "type": "boolean"
+                },
                 "email": {
                     "type": "string"
                 },
@@ -7234,6 +7238,10 @@ const docTemplate = `{
                         }
                     ]
                 },
+                "eid_proxy": {
+                    "description": "EIDProxy нь SSO eID proxy идэвхтэй эсэхийг заана — идэвхтэй бол иргэн\nлокал eID linkage-гүй (SSO-ээр нэвтэрсэн) байсан ч eID PKI самбарыг SSO-\nгоор дамжуулан үзэж болно. Frontend eID хуудсуудыг үүгээр нээнэ.",
+                    "type": "boolean"
+                },
                 "email": {
                     "type": "string"
                 },
@@ -7303,6 +7311,10 @@ const docTemplate = `{
                             "$ref": "#/definitions/template_internal_http_datatransfers_responses.EIDInfo"
                         }
                     ]
+                },
+                "eid_proxy": {
+                    "description": "EIDProxy нь SSO eID proxy идэвхтэй эсэхийг заана — идэвхтэй бол иргэн\nлокал eID linkage-гүй (SSO-ээр нэвтэрсэн) байсан ч eID PKI самбарыг SSO-\nгоор дамжуулан үзэж болно. Frontend eID хуудсуудыг үүгээр нээнэ.",
+                    "type": "boolean"
                 },
                 "email": {
                     "type": "string"
@@ -7465,6 +7477,10 @@ const docTemplate = `{
                             "$ref": "#/definitions/template_internal_http_datatransfers_responses.EIDInfo"
                         }
                     ]
+                },
+                "eid_proxy": {
+                    "description": "EIDProxy нь SSO eID proxy идэвхтэй эсэхийг заана — идэвхтэй бол иргэн\nлокал eID linkage-гүй (SSO-ээр нэвтэрсэн) байсан ч eID PKI самбарыг SSO-\nгоор дамжуулан үзэж болно. Frontend eID хуудсуудыг үүгээр нээнэ.",
+                    "type": "boolean"
                 },
                 "email": {
                     "type": "string"

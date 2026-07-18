@@ -77,7 +77,7 @@ func newAuthzServer(t *testing.T) (*httptest.Server, jwt.JWTService) {
 
 	r := chi.NewRouter()
 	r.Route("/api", func(api chi.Router) {
-		routes.NewUsersRoute(api, usersUC, authMW).Routes()
+		routes.NewUsersRoute(api, usersUC, authMW, false).Routes()
 		routes.NewRBACRoute(api, rbacUC, auditUC, authMW).Routes()
 		routes.NewOrgRoute(api, orgUC, auditUC, authMW).Routes()
 		routes.NewAdminRoute(api, usersUC, rbacUC, aiUC, authMW).Routes()
