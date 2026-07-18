@@ -246,10 +246,14 @@ func (c *Client) LogoutURLFor(idTokenHint string) string {
 // нэвтэрсэн иргэнд name/given_name/family_name-г (кирилл) буцаадаг; email/
 // national_id нь тухайн scope/урсгалд байхгүй байж болзошгүй.
 type UserInfo struct {
-	Sub           string `json:"sub"`
-	Name          string `json:"name"`
-	GivenName     string `json:"given_name"`
-	FamilyName    string `json:"family_name"`
+	Sub        string `json:"sub"`
+	Name       string `json:"name"`
+	GivenName  string `json:"given_name"`
+	FamilyName string `json:"family_name"`
+	// Латин (англи) нэр — SSO нь profile scope-д given_name_en/family_name_en
+	// claim-аар буцаадаг (иргэний eID identity-ээс). RP-д латин нэрийг харуулна.
+	GivenNameEn   string `json:"given_name_en"`
+	FamilyNameEn  string `json:"family_name_en"`
 	Email         string `json:"email"`
 	EmailVerified bool   `json:"email_verified"`
 	// nationalid scope-ийн claims (SSO client-д тухайн scope байвал):

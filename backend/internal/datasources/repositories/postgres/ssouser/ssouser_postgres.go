@@ -108,6 +108,8 @@ func (r *ssoUserRepository) UpsertByCivilID(ctx context.Context, civilID, nation
 				sso_sub        = EXCLUDED.sso_sub,
 				first_name     = COALESCE(NULLIF(EXCLUDED.first_name, ''), users.first_name),
 				last_name      = COALESCE(NULLIF(EXCLUDED.last_name, ''), users.last_name),
+				first_name_en  = COALESCE(NULLIF(EXCLUDED.first_name_en, ''), users.first_name_en),
+				last_name_en   = COALESCE(NULLIF(EXCLUDED.last_name_en, ''), users.last_name_en),
 				google_sub     = COALESCE(EXCLUDED.google_sub, users.google_sub),
 				google_email   = COALESCE(EXCLUDED.google_email, users.google_email),
 				google_name    = COALESCE(EXCLUDED.google_name, users.google_name),

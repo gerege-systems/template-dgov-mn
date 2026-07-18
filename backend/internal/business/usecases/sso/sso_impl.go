@@ -138,6 +138,9 @@ func (u *usecase) finish(ctx context.Context, tokens oidc.Tokens) (CompleteRespo
 	if firstName == "" && lastName == "" && strings.TrimSpace(info.Name) != "" {
 		lastName = strings.TrimSpace(info.Name)
 	}
+	// Латин нэр — SSO-ий given_name_en/family_name_en claim-аас (profile scope).
+	firstNameEn := strings.TrimSpace(info.GivenNameEn)
+	lastNameEn := strings.TrimSpace(info.FamilyNameEn)
 
 	// nationalid scope-оос иргэний дугаар (register_number = civil id) ирсэн бол
 	// байгаа eID хэрэглэгчтэй civil_id-ээр тааруулна — ижил регистрээр eID болон
@@ -158,6 +161,8 @@ func (u *usecase) finish(ctx context.Context, tokens oidc.Tokens) (CompleteRespo
 			Username:      "eid_" + civilID,
 			FirstName:     firstName,
 			LastName:      lastName,
+			FirstNameEn:   firstNameEn,
+			LastNameEn:    lastNameEn,
 			GoogleSub:     googleSub,
 			GoogleEmail:   googleEmail,
 			GoogleName:    googleName,
@@ -173,6 +178,8 @@ func (u *usecase) finish(ctx context.Context, tokens oidc.Tokens) (CompleteRespo
 			Username:      "sso_" + slug,
 			FirstName:     firstName,
 			LastName:      lastName,
+			FirstNameEn:   firstNameEn,
+			LastNameEn:    lastNameEn,
 			Email:         "sso_" + slug + "@sso.local",
 			GoogleSub:     googleSub,
 			GoogleEmail:   googleEmail,
