@@ -57,6 +57,7 @@ export default function LandingPage({ next, themeLanding }: Props) {
             <a href="#features">{t.nav.features}</a>
             <a href="#security">{t.nav.security}</a>
             <a href="#tech">{t.nav.tech}</a>
+            <a href="/docs/">{t.nav.docs}</a>
           </nav>
 
           <div className="lp-nav__actions">

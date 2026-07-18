@@ -9,7 +9,7 @@
 export interface LandingCopy {
   /** Брэнд нэр (nav + footer). Хоосон бол 'Government Template Platform V3.0'. Theme-ээр солино. */
   brand?: string;
-  nav: { features: string; security: string; tech: string; login: string };
+  nav: { features: string; security: string; tech: string; docs: string; login: string };
   hero: {
     badge: string;
     titleLead: string;
@@ -58,7 +58,7 @@ export interface LandingCopy {
 
 const mn: LandingCopy = {
   brand: 'Government Template Platform V3.0',
-  nav: { features: 'Боломжууд', security: 'Аюулгүй байдал', tech: 'Технологи', login: 'Нэвтрэх' },
+  nav: { features: 'Боломжууд', security: 'Аюулгүй байдал', tech: 'Технологи', docs: 'Баримт', login: 'Нэвтрэх' },
   hero: {
     badge: 'Government Template Platform V3.0 · eID суурьтай · AI-жуулсан',
     titleLead: 'Цахим засаглалыг',
@@ -150,7 +150,7 @@ const mn: LandingCopy = {
 
 const en: LandingCopy = {
   brand: 'Government Template Platform V3.0',
-  nav: { features: 'Features', security: 'Security', tech: 'Technology', login: 'Sign in' },
+  nav: { features: 'Features', security: 'Security', tech: 'Technology', docs: 'Docs', login: 'Sign in' },
   hero: {
     badge: 'Government Template Platform V3.0 · eID-based · AI-enabled',
     titleLead: 'The foundation to',
