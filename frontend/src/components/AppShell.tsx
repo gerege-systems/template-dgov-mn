@@ -12,6 +12,7 @@ import {
   Plug,
   Gauge, Server, Crown, Palette,
   Landmark, Inbox, FileCheck, CalendarClock, Wallet, Bell,
+  CreditCard, Smartphone, FileSignature,
 } from 'lucide-react';
 import UserMenu from './UserMenu';
 import NavSearch, { type SearchItem } from './NavSearch';
@@ -135,8 +136,8 @@ const SYSTEMS: NavSystem[] = [
     ],
   },
   {
-    // Иргэнд харагдах гол систем — ТӨРИЙН ҮЙЛЧИЛГЭЭ. eID бүлгийг template-ээс
-    // хассан (хуудсууд /me/eid/* хэвээр байгаа ч зүүн цэсэнд харагдахгүй).
+    // Иргэнд харагдах гол систем — ТӨРИЙН ҮЙЛЧИЛГЭЭ + eID. eID бүлэг нь SSO-ийн
+    // eID proxy service-үүдтэй холбогдож ажиллана (backend EID_* тохиргоо).
     key: 'me',
     labelKey: 'sys.gov',
     brand: 'Government Services',
@@ -155,10 +156,21 @@ const SYSTEMS: NavSystem[] = [
         ],
       },
       {
+        labelKey: 'group.eid',
+        items: [
+          { href: '/me/eid/id', labelKey: 'nav.eidId', icon: CreditCard },
+          { href: '/me/eid/certificates', labelKey: 'nav.eidCerts', icon: KeyRound },
+          { href: '/me/eid/devices', labelKey: 'nav.eidDevices', icon: Smartphone },
+          { href: '/me/eid/logs', labelKey: 'nav.eidLogs', icon: ScrollText },
+          { href: '/me/eid/security', labelKey: 'nav.eidSecurity', icon: ShieldCheck },
+        ],
+      },
+      {
         labelKey: 'group.personal',
         // Профайл, Тохиргоо нь баруун дээд dropdown-д байгаа тул зүүн цэсэнд давхардуулахгүй.
         items: [
           { href: '/me/organizations', labelKey: 'nav.org', icon: Building2 },
+          { href: '/me/eid/sign', labelKey: 'nav.eidSign', icon: FileSignature },
           { href: '/me/integrations', labelKey: 'nav.integrations', icon: Plug },
           { href: '/me/ai', labelKey: 'nav.ai', icon: Bot },
           { href: '/me/translate', labelKey: 'nav.translate', icon: Languages },
