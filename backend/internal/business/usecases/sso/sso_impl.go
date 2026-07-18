@@ -16,6 +16,7 @@ import (
 	"template/internal/business/domain"
 	"template/internal/datasources/caches"
 	"template/pkg/jwt"
+	"template/pkg/logger"
 	"template/pkg/oidc"
 )
 
@@ -30,19 +31,28 @@ const statePrefix = "sso:state:"
 const idtPrefix = "sso:idt:"
 const logoutTTL = 7 * 24 * time.Hour
 
+// TokenStorer нь нэвтрэлтийн дараа иргэний SSO OAuth токенуудыг хадгална (SSO
+// eID proxy-д зориулж). Хоосон/nil бол токен хадгалахгүй (proxy идэвхгүй).
+// *ssotoken.Service үүнийг хангадаг.
+type TokenStorer interface {
+	Store(ctx context.Context, userID string, tok oidc.Tokens) error
+}
+
 type usecase struct {
 	oidc           *oidc.Client
 	store          UserStore
 	jwt            jwt.JWTService
 	redis          caches.RedisCache
 	nativeClientID string
+	tokens         TokenStorer // сонголттой — nil бол SSO токен хадгалахгүй
 }
 
 // NewUsecase нь SSO usecase угсарна. nativeClientID нь mobile (PKCE, public
 // client) урсгалын Hydra client_id (жишээ template-dgov-mn-ios) — хоосон бол
-// native code-exchange идэвхгүй.
-func NewUsecase(oidcClient *oidc.Client, store UserStore, jwtSvc jwt.JWTService, redis caches.RedisCache, nativeClientID string) Usecase {
-	return &usecase{oidc: oidcClient, store: store, jwt: jwtSvc, redis: redis, nativeClientID: nativeClientID}
+// native code-exchange идэвхгүй. tokenStorer нь SSO eID proxy-д зориулж токен
+// хадгалах (nil бол хадгалахгүй).
+func NewUsecase(oidcClient *oidc.Client, store UserStore, jwtSvc jwt.JWTService, redis caches.RedisCache, nativeClientID string, tokenStorer TokenStorer) Usecase {
+	return &usecase{oidc: oidcClient, store: store, jwt: jwtSvc, redis: redis, nativeClientID: nativeClientID, tokens: tokenStorer}
 }
 
 func (u *usecase) Configured() bool { return u.oidc.Configured() }
@@ -81,12 +91,13 @@ func (u *usecase) Complete(ctx context.Context, state, code string) (CompleteRes
 		return CompleteResponse{}, apperror.BadRequest("SSO нэвтрэлтийн хугацаа дууссан эсвэл хүчингүй байна. Дахин оролдоно уу.")
 	}
 
-	// Code → access token + id token (client_secret_basic), дараа нь shared tail.
-	accessToken, idToken, err := u.oidc.Exchange(ctx, code)
+	// Code → access/id/refresh token (client_secret_basic), дараа нь shared tail.
+	// refresh_token (offline_access) нь SSO eID proxy-д зориулж хадгалагдана.
+	tokens, err := u.oidc.ExchangeFull(ctx, code)
 	if err != nil {
 		return CompleteResponse{}, apperror.InternalCause(err)
 	}
-	return u.finish(ctx, accessToken, idToken)
+	return u.finish(ctx, tokens)
 }
 
 // CompleteNative нь mobile (PKCE, public client) урсгалын authorization code-ийг
@@ -105,13 +116,17 @@ func (u *usecase) CompleteNative(ctx context.Context, code, codeVerifier, redire
 	if err != nil {
 		return CompleteResponse{}, apperror.InternalCause(err)
 	}
-	return u.finish(ctx, accessToken, idToken)
+	// Native (PKCE) урсгал нь refresh_token хадгалахгүй — eID proxy нь web BFF-ээр
+	// дуудагдана. Тиймээс Tokens зөвхөн access/id-тэй.
+	return u.finish(ctx, oidc.Tokens{AccessToken: accessToken, IDToken: idToken})
 }
 
-// finish нь access/id token авсны дараах нийтлэг tail — web (Complete) болон
-// native (CompleteNative) хоёулаа хуваалцана: /userinfo → нэр/иргэний дугаар →
-// upsert → JWT хос → refresh санах → id_token ref → CompleteResponse.
-func (u *usecase) finish(ctx context.Context, accessToken, idToken string) (CompleteResponse, error) {
+// finish нь токен авсны дараах нийтлэг tail — web (Complete) болон native
+// (CompleteNative) хоёулаа хуваалцана: /userinfo → нэр/иргэний дугаар → upsert →
+// SSO токен хадгалах (proxy) → JWT хос → refresh санах → id_token ref →
+// CompleteResponse.
+func (u *usecase) finish(ctx context.Context, tokens oidc.Tokens) (CompleteResponse, error) {
+	accessToken, idToken := tokens.AccessToken, tokens.IDToken
 	info, err := u.oidc.UserInfo(ctx, accessToken)
 	if err != nil {
 		return CompleteResponse{}, apperror.InternalCause(err)
@@ -170,6 +185,15 @@ func (u *usecase) finish(ctx context.Context, accessToken, idToken string) (Comp
 	}
 	if err != nil {
 		return CompleteResponse{}, apperror.InternalCause(fmt.Errorf("upsert sso user: %w", err))
+	}
+
+	// SSO OAuth токенуудыг (refresh_token-той бол) хадгална — SSO eID proxy-г
+	// иргэний нэрийн өмнөөс дуудахад ашиглана. Алдаа гарвал нэвтрэлтийг унагахгүй
+	// (proxy боломжгүй болно, гэхдээ бусад eID урсгал шууд ажиллана).
+	if u.tokens != nil {
+		if sErr := u.tokens.Store(ctx, stored.ID, tokens); sErr != nil {
+			logger.ErrorWithContext(ctx, "sso: failed to store SSO tokens (non-fatal)", logger.Fields{"error": sErr.Error()})
+		}
 	}
 
 	pair, err := u.jwt.GenerateTokenPair(stored.ID, stored.IsAdmin(), stored.RoleID, stored.Email)

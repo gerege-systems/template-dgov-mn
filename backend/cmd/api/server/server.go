@@ -37,6 +37,7 @@ import (
 	"template/internal/business/usecases/sign"
 	siteuc "template/internal/business/usecases/site"
 	"template/internal/business/usecases/sso"
+	"template/internal/business/usecases/ssotoken"
 	"template/internal/business/usecases/superadmin"
 	onboarding "template/internal/business/usecases/superadmin_onboarding"
 	themeuc "template/internal/business/usecases/theme"
@@ -57,6 +58,7 @@ import (
 	recoverypostgres "template/internal/datasources/repositories/postgres/recovery"
 	securitypostgres "template/internal/datasources/repositories/postgres/security"
 	sitepostgres "template/internal/datasources/repositories/postgres/site"
+	ssotokenpostgres "template/internal/datasources/repositories/postgres/ssotoken"
 	ssouserpostgres "template/internal/datasources/repositories/postgres/ssouser"
 	superadminaccountpostgres "template/internal/datasources/repositories/postgres/superadminaccount"
 	superadmininvitepostgres "template/internal/datasources/repositories/postgres/superadmininvite"
@@ -71,6 +73,7 @@ import (
 	"template/internal/provider/adminkeys"
 	"template/internal/provider/devapps"
 	"template/internal/provider/signrelay"
+	"template/pkg/crypto"
 	"template/pkg/eid"
 	"template/pkg/gemini"
 	"template/pkg/google"
@@ -80,6 +83,7 @@ import (
 	"template/pkg/logger"
 	"template/pkg/observability"
 	"template/pkg/oidc"
+	"template/pkg/ssoeidproxy"
 	"template/pkg/verify"
 	"template/pkg/xyp"
 
@@ -199,6 +203,33 @@ func NewApp() (*App, error) {
 	googleClient := google.NewClient(config.AppConfig.GoogleClientID, config.AppConfig.GoogleClientSecret)
 	// Gerege Verify / XYP — улсын бүртгэлээс байгууллагын мэдээлэл (eID байгууллага холбох).
 	xypClient := xyp.NewClient(config.AppConfig.XYPAPIBase, config.AppConfig.XYPClientID, config.AppConfig.XYPClientSecret)
+
+	// Government SSO (sso.dgov.mn, OIDC) client — RP нэвтрэлт (ssoUC доор) болон
+	// eID proxy-д хуваалцана.
+	ssoClient := oidc.NewClient(config.AppConfig.SSOIssuer, config.AppConfig.SSOClientID, config.AppConfig.SSOClientSecret, config.AppConfig.SSORedirectURI, config.AppConfig.SSOScope)
+
+	// SSO eID proxy (сонголттой) — SSO_EID_PROXY_BASE_URL + INTEGRATION_ENC_KEY
+	// хоёулаа тохируулсан бол иргэний PKI самбар (summary/certificates/devices/
+	// activity) нь шууд eidmongolia-ий оронд sso.dgov.mn/rp/eid-ээр дамжина.
+	// Токенуудыг шифрлэн (sso_tokens) хадгалж, хугацаа дуусахад refresh хийнэ.
+	// Хоосон бол шууд eidmongolia зам (өөрчлөлтгүй).
+	var (
+		ssoEidProxy    auth.SSOEidProxy
+		ssoTokens      auth.SSOTokenService
+		ssoTokenStorer sso.TokenStorer
+	)
+	if config.AppConfig.SSOEidProxyBaseURL != "" && config.AppConfig.IntegrationEncKey != "" {
+		tokenCipher, cErr := crypto.New(config.AppConfig.IntegrationEncKey)
+		if cErr != nil {
+			return nil, fmt.Errorf("init sso token cipher: %w", cErr)
+		}
+		tokenSvc := ssotoken.New(ssotokenpostgres.NewSSOTokenRepository(pool, tokenCipher), ssoClient)
+		ssoTokens = tokenSvc
+		ssoTokenStorer = tokenSvc
+		ssoEidProxy = ssoeidproxy.New(config.AppConfig.SSOEidProxyBaseURL)
+		logger.Info("SSO eID proxy enabled — PKI dashboard reads proxied via SSO", logger.Fields{"base": config.AppConfig.SSOEidProxyBaseURL})
+	}
+
 	authUC := auth.NewUsecase(usersUC, jwtService, verifier, eidClient, xypClient, googleClient, redisCache, auth.Config{
 		OTPMaxAttempts:    config.AppConfig.OTPMaxAttempts,
 		OTPTTL:            time.Duration(config.AppConfig.REDISExpired) * time.Minute,
@@ -210,6 +241,8 @@ func NewApp() (*App, error) {
 		ForgotLockoutTTL:  15 * time.Minute,
 		EIDCallbackURL:    config.AppConfig.EIDCallbackURL,
 		EIDDisplayText:    config.AppConfig.EIDDisplayText,
+		SSOEidProxy:       ssoEidProxy,
+		SSOTokens:         ssoTokens,
 	})
 
 	// RBAC — динамик role/permission удирдлага + enforcement.
@@ -235,9 +268,10 @@ func NewApp() (*App, error) {
 	// Government SSO (sso.dgov.mn, OIDC) — гадаад SSO provider-т нэвтрэх RP урсгал.
 	// Энэ апп нь sso.dgov.mn-ий relying party: нэвтрэлтийг тийш даатгаж, буцаж
 	// ирсэн code-ийг токен болгож солин, хэрэглэгчийг sso_sub-ээр upsert хийнэ.
-	ssoClient := oidc.NewClient(config.AppConfig.SSOIssuer, config.AppConfig.SSOClientID, config.AppConfig.SSOClientSecret, config.AppConfig.SSORedirectURI, config.AppConfig.SSOScope)
+	// ssoClient дээр (eID proxy-тай хамт) угсарсан. ssoTokenStorer нь SSO eID
+	// proxy идэвхтэй үед нэвтрэлтийн дараа токенуудыг хадгална (nil бол алгасна).
 	ssoRepo := ssouserpostgres.NewSSOUserRepository(pool)
-	ssoUC := sso.NewUsecase(ssoClient, ssoRepo, jwtService, redisCache, config.AppConfig.SSONativeClientID)
+	ssoUC := sso.NewUsecase(ssoClient, ssoRepo, jwtService, redisCache, config.AppConfig.SSONativeClientID, ssoTokenStorer)
 
 	// Хэрэглэгчийн гуравдагч этгээдийн интеграци (Google Drive/Meet, Dropbox) —
 	// OAuth токеныг шифрлэн хадгална (RLS-тэй per-user хүснэгт).

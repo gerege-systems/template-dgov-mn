@@ -163,6 +163,13 @@ type Config struct {
 	// SSONativeClientID нь mobile (PKCE, public) урсгалын client_id (хоосон бол
 	// default template-dgov-mn-ios).
 	SSONativeClientID string `mapstructure:"SSO_NATIVE_CLIENT_ID"`
+	// SSOEidProxyBaseURL нь SSO-ий eID proxy-ийн суурь URL (жишээ
+	// https://sso.dgov.mn/rp/eid). Тохируулсан бол иргэний PKI самбар
+	// (summary/certificates/devices/activity) нь шууд eidmongolia-ий оронд SSO
+	// proxy-гоор дамжина — энэ апп-д eID RP creds/PKI_READ шаардахгүй. Хоосон бол
+	// шууд eidmongolia (EID_BASE_URL) зам. offline_access scope + хадгалагдсан
+	// SSO refresh token шаардана.
+	SSOEidProxyBaseURL string `mapstructure:"SSO_EID_PROXY_BASE_URL"`
 
 	// --- OIDC PROVIDER тал (sso.dgov.mn нь Ory Hydra-г урдаа тавьж SSO provider
 	// болно). HYDRA_*/SSO_ADMIN_* нь PROVIDER (issuer) тал. ---

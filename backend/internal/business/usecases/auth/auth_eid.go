@@ -17,8 +17,25 @@ import (
 	"template/internal/business/usecases/users"
 	"template/pkg/eid"
 	"template/pkg/logger"
+	"template/pkg/ssoeidproxy"
 	"template/pkg/xyp"
 )
+
+// SSOEidProxy нь dgov SSO-ий eID proxy-г иргэний Bearer access token-оор уншина
+// (pkg/ssoeidproxy). Config-д тавьсан бол PKI самбарын GET-үүд шууд eidmongolia-
+// ий оронд SSO proxy-гоор дамжина (энэ RP-д PKI_READ эрх шаардахгүй).
+type SSOEidProxy interface {
+	Summary(ctx context.Context, accessToken string) (*eid.PersonSummary, error)
+	Certificates(ctx context.Context, accessToken string) (*eid.PersonCertificates, error)
+	Devices(ctx context.Context, accessToken string) (*eid.PersonDevices, error)
+	Activity(ctx context.Context, accessToken string, limit, offset int) (*eid.PersonActivity, error)
+}
+
+// SSOTokenService нь хэрэглэгчийн хүчинтэй SSO access token-ыг (шаардвал refresh
+// хийж) буцаана. Хадгалагдсан токен байхгүй бол domain.ErrSSOTokenNotFound.
+type SSOTokenService interface {
+	ValidAccessToken(ctx context.Context, userID string) (string, error)
+}
 
 // eidPollTimeoutMs нь IdP-ийн session long-poll-ийн хүлээх дээд хугацаа (мс).
 // eid client-ийн HTTP timeout (30с) үүнээс урт тул сүлжээ дуусахаас өмнө IdP
@@ -324,10 +341,36 @@ func (uc *usecase) eidPersonEtsi(ctx context.Context, userID string) (string, er
 // mapPKIErr нь eID PKI дуудлагын алдааг HTTP-д буулгана: PKI_READ эрхгүй (403)
 // бол Forbidden (frontend "эрх хүлээгдэж байна" харуулна), бусад бол Internal.
 func mapPKIErr(err error) error {
-	if errors.Is(err, eid.ErrPKINotPermitted) {
+	switch {
+	case errors.Is(err, eid.ErrPKINotPermitted):
 		return apperror.Forbidden("eID PKI хандах эрх (PKI_READ) олгогдоогүй байна")
+	case errors.Is(err, ssoeidproxy.ErrTokenExpired):
+		return apperror.Unauthorized("eID мэдээлэл авахын тулд SSO-гоор дахин нэвтэрнэ үү")
+	case errors.Is(err, ssoeidproxy.ErrProxyDisabled):
+		return apperror.Internal("eID үйлчилгээ түр боломжгүй байна")
+	default:
+		return apperror.InternalCause(fmt.Errorf("eid pki: %w", err))
 	}
-	return apperror.InternalCause(fmt.Errorf("eid pki: %w", err))
+}
+
+// eidProxyEnabled нь SSO eID proxy тохируулагдсан (proxy client + token service
+// хоёулаа inject хийгдсэн) эсэхийг мэдээлнэ. Тийм бол PKI унших GET-үүд шууд
+// eidmongolia-ий оронд SSO proxy-гоор дамжина.
+func (uc *usecase) eidProxyEnabled() bool {
+	return uc.cfg.SSOEidProxy != nil && uc.cfg.SSOTokens != nil
+}
+
+// ssoProxyAccessToken нь хэрэглэгчийн хүчинтэй SSO access token-ыг авна. Токен
+// байхгүй бол дахин нэвтрэх (401) төлөв буцаана.
+func (uc *usecase) ssoProxyAccessToken(ctx context.Context, userID string) (string, error) {
+	token, err := uc.cfg.SSOTokens.ValidAccessToken(ctx, userID)
+	if err != nil {
+		if errors.Is(err, domain.ErrSSOTokenNotFound) {
+			return "", apperror.Unauthorized("eID мэдээлэл авахын тулд SSO-гоор дахин нэвтэрнэ үү")
+		}
+		return "", apperror.InternalCause(fmt.Errorf("sso token: %w", err))
+	}
+	return token, nil
 }
 
 // EIDRepresentations нь нэвтэрсэн хэрэглэгчийн civil_id-аар ETSI танигч
@@ -533,6 +576,17 @@ func mapSignerErr(err error) error {
 
 // EIDSummary нь иргэний PKI самбарын нэгдсэн тоог буцаана.
 func (uc *usecase) EIDSummary(ctx context.Context, userID string) (*eid.PersonSummary, error) {
+	if uc.eidProxyEnabled() {
+		token, err := uc.ssoProxyAccessToken(ctx, userID)
+		if err != nil {
+			return nil, err
+		}
+		res, pErr := uc.cfg.SSOEidProxy.Summary(ctx, token)
+		if pErr != nil {
+			return nil, mapPKIErr(pErr)
+		}
+		return res, nil
+	}
 	etsi, err := uc.eidPersonEtsi(ctx, userID)
 	if err != nil || etsi == "" {
 		return nil, err
@@ -546,6 +600,17 @@ func (uc *usecase) EIDSummary(ctx context.Context, userID string) (*eid.PersonSu
 
 // EIDCertificates нь иргэний гэрчилгээний жагсаалт + тоог буцаана.
 func (uc *usecase) EIDCertificates(ctx context.Context, userID string) (*eid.PersonCertificates, error) {
+	if uc.eidProxyEnabled() {
+		token, err := uc.ssoProxyAccessToken(ctx, userID)
+		if err != nil {
+			return nil, err
+		}
+		res, pErr := uc.cfg.SSOEidProxy.Certificates(ctx, token)
+		if pErr != nil {
+			return nil, mapPKIErr(pErr)
+		}
+		return res, nil
+	}
 	etsi, err := uc.eidPersonEtsi(ctx, userID)
 	if err != nil || etsi == "" {
 		return nil, err
@@ -559,6 +624,17 @@ func (uc *usecase) EIDCertificates(ctx context.Context, userID string) (*eid.Per
 
 // EIDDevices нь иргэний холбоотой төхөөрөмжүүдийг буцаана.
 func (uc *usecase) EIDDevices(ctx context.Context, userID string) (*eid.PersonDevices, error) {
+	if uc.eidProxyEnabled() {
+		token, err := uc.ssoProxyAccessToken(ctx, userID)
+		if err != nil {
+			return nil, err
+		}
+		res, pErr := uc.cfg.SSOEidProxy.Devices(ctx, token)
+		if pErr != nil {
+			return nil, mapPKIErr(pErr)
+		}
+		return res, nil
+	}
 	etsi, err := uc.eidPersonEtsi(ctx, userID)
 	if err != nil || etsi == "" {
 		return nil, err
@@ -572,6 +648,17 @@ func (uc *usecase) EIDDevices(ctx context.Context, userID string) (*eid.PersonDe
 
 // EIDActivity нь RP-scoped auth/sign түүх + тоог буцаана.
 func (uc *usecase) EIDActivity(ctx context.Context, userID string, limit, offset int) (*eid.PersonActivity, error) {
+	if uc.eidProxyEnabled() {
+		token, err := uc.ssoProxyAccessToken(ctx, userID)
+		if err != nil {
+			return nil, err
+		}
+		res, pErr := uc.cfg.SSOEidProxy.Activity(ctx, token, limit, offset)
+		if pErr != nil {
+			return nil, mapPKIErr(pErr)
+		}
+		return res, nil
+	}
 	etsi, err := uc.eidPersonEtsi(ctx, userID)
 	if err != nil || etsi == "" {
 		return nil, err
