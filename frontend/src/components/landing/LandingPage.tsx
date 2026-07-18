@@ -80,6 +80,7 @@ export default function LandingPage({ next, themeLanding }: Props) {
       <main id="top">
         {/* ---------- Hero (login card шигтгэсэн) ---------- */}
         <section className="lp-hero">
+          <div className="lp-hero__art" aria-hidden="true" />
           <div className="lp-hero__pattern" aria-hidden="true" />
           <div className="lp-hero__inner">
             <div className="lp-hero__copy">

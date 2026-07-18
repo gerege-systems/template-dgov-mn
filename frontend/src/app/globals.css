@@ -1676,6 +1676,13 @@ html[lang="en"] .i18n-banner { display: block; }
 
 /* ---------- Hero ---------- */
 .lp-hero { position: relative; background: var(--lp-navy); overflow: hidden; }
+/* Утга бүхий hero чимэглэл (цахим засаглалыг бүтээх суурь) — бүх талбайг дүүргэнэ */
+.lp-hero__art {
+  position: absolute; inset: 0;
+  background: url(/hero-art.svg) center center / cover no-repeat;
+  opacity: 0.95;
+  pointer-events: none;
+}
 .lp-hero__pattern {
   position: absolute; inset: 0;
   background-image: radial-gradient(circle at 1px 1px, oklch(100% 0 0 / 0.06) 1px, transparent 0);
