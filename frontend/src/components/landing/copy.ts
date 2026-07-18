@@ -66,7 +66,7 @@ const mn: LandingCopy = {
     titleTail: 'суурь',
     lede:
       'Government Template Platform V3.0 нь төрийн аливаа цахим үйлчилгээг дээр нь босгож болох, үйлдвэрлэлд бэлэн, аюулгүй байдлаар хатуужуулсан бүрэн стек. Цэвэр архитектур бүхий Go сервер, Next.js BFF нүүр, Gemini AI урсгал, eID нэвтрэлт — бүгд эхний өдрөөс нэгдмэл, туршигдсан хэлбэрээр бэлэн.',
-    ctaLogin: 'eID-ээр туршиж үзэх',
+    ctaLogin: 'Government SSO-оор нэвтрэх',
     ctaExplore: 'Боломжийг үзэх',
     stackLabel: 'Дэмждэг стандартууд',
     stats: [
@@ -137,7 +137,7 @@ const mn: LandingCopy = {
   cta: {
     title: 'Цахим засаглалаа өнөөдрөөс бүтээж эхэл',
     sub: 'Government Template Platform V3.0 нь дэд бүтцийг бэлэн болгож өгнө — та зөвхөн үйлчилгээгээ бүтээхэд анхаарна. eID-ээр нэвтэрч, бэлэн боломжуудыг өөрөө туршина уу.',
-    ctaLogin: 'eID-ээр туршиж үзэх',
+    ctaLogin: 'Government SSO-оор нэвтрэх',
     ctaExplore: 'Боломжийг үзэх',
     tagline: 'Цэвэр архитектур · Нээлттэй стандарт · Найдвартай хамгаалалт',
   },
@@ -158,7 +158,7 @@ const en: LandingCopy = {
     titleTail: 'governance',
     lede:
       'Government Template Platform V3.0 is a production-ready, security-hardened full stack for building any digital-government service on top. A Clean-Architecture Go backend, a Next.js BFF frontend, a Gemini AI pipeline and eID sign-in — all wired together and ready from day one.',
-    ctaLogin: 'Try the eID sign-in',
+    ctaLogin: 'Sign in with Government SSO',
     ctaExplore: 'Explore features',
     stackLabel: 'Standards supported',
     stats: [
@@ -229,7 +229,7 @@ const en: LandingCopy = {
   cta: {
     title: 'Start building digital governance today',
     sub: 'Government Template Platform V3.0 gives you the infrastructure ready-made — so you focus only on your service. Sign in with eID and try the built-in capabilities yourself.',
-    ctaLogin: 'Try the eID sign-in',
+    ctaLogin: 'Sign in with Government SSO',
     ctaExplore: 'Explore features',
     tagline: 'Clean Architecture · Open standards · Secure by design',
   },

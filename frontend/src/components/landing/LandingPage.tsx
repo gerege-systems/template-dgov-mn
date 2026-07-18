@@ -9,7 +9,6 @@ import {
   LogIn, Languages, KeyRound, ScrollText, Globe, Gauge, ShieldAlert,
 } from 'lucide-react';
 import { useLang } from '@/lib/lang';
-import LoginForm from '@/app/login/LoginForm';
 import { landingCopy, type LandingCopy } from './copy';
 import { deepMerge } from '@/lib/theme';
 
@@ -29,16 +28,19 @@ interface Props {
 /**
  * Government Template Platform V3.0 — «Цахим засаглалыг бүтээх суурь» нүүр
  * (landing). Нэвтрээгүй зочдод харагдах маркетингийн нүүр. Платформын бүх
- * чадварыг харуулж, hero-ийн баруун талд ОДОО БАЙГАА нэвтрэх картыг (SigninShell
- * доторх `.signin-card` + LoginForm) шигтгэв. Брэнд токен (blue + gold,
- * light/dark) дээр найруулав.
+ * чадварыг харуулж, hero-ийн баруун талд Government SSO (sso.dgov.mn)-оор
+ * нэвтрэх картыг шигтгэв. Нэвтрэх товч дарахад sso.dgov.mn руу шилжиж, тэндээ
+ * нэвтэрч, буцаж ирнэ (OIDC RP урсгал). Брэнд токен (blue + gold) дээр найруулав.
  */
-export default function LandingPage({ next, notice, googleLink, googleError, themeLanding }: Props) {
+export default function LandingPage({ next, themeLanding }: Props) {
   const { lang, setLang } = useLang();
   // Идэвхтэй theme-ийн текст байвал copy.ts default дээр гүн merge хийнэ.
   const override = themeLanding?.[lang];
   const t = override ? deepMerge(landingCopy[lang], override) : landingCopy[lang];
   const brand = t.brand || 'Government Template Platform V3.0';
+  // Government SSO (sso.dgov.mn) руу нэвтрэлт эхлүүлэх — backend /sso/start руу
+  // прокси хийж, browser-ийг sso.dgov.mn-ий authorize URL руу шилжүүлнэ.
+  const ssoHref = `/api/auth/sso/start${next ? `?next=${encodeURIComponent(next)}` : ''}`;
 
   return (
     <div className="lp">
@@ -67,7 +69,7 @@ export default function LandingPage({ next, notice, googleLink, googleError, the
               <Languages size={15} strokeWidth={2} />
               <span>{lang === 'mn' ? 'EN' : 'МН'}</span>
             </button>
-            <a className="lp-btn lp-btn--gold lp-btn--sm" href="#login">
+            <a className="lp-btn lp-btn--gold lp-btn--sm" href={ssoHref}>
               <LogIn size={16} strokeWidth={2} />
               <span>{t.nav.login}</span>
             </a>
@@ -93,7 +95,7 @@ export default function LandingPage({ next, notice, googleLink, googleError, the
               <p className="lp-hero__lede">{t.hero.lede}</p>
 
               <div className="lp-hero__cta">
-                <a className="lp-btn lp-btn--gold lp-btn--lg" href="#login">
+                <a className="lp-btn lp-btn--gold lp-btn--lg" href={ssoHref}>
                   {t.hero.ctaLogin}
                   <ArrowRight size={18} strokeWidth={2} />
                 </a>
@@ -112,15 +114,25 @@ export default function LandingPage({ next, notice, googleLink, googleError, the
               </div>
             </div>
 
-            {/* ОДОО БАЙГАА нэвтрэх карт — hero-ийн баруун талд шигтгэв */}
+            {/* Government SSO (sso.dgov.mn)-оор нэвтрэх карт — hero-ийн баруун талд */}
             <div className="lp-hero__visual">
-              <section id="login" className="signin-card lp-hero__login" aria-labelledby="login-title">
-                <LoginForm
-                  next={next}
-                  notice={notice}
-                  googleLink={googleLink}
-                  googleError={googleError}
-                />
+              <section
+                id="login"
+                className="signin-card lp-hero__login"
+                aria-labelledby="login-title"
+                style={{ padding: '2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+              >
+                <h2 id="login-title" style={{ margin: 0, fontSize: '1.25rem' }}>{t.cta.title}</h2>
+                <p style={{ margin: 0, opacity: 0.8 }}>{t.cta.sub}</p>
+                <a
+                  className="lp-btn lp-btn--gold lp-btn--lg"
+                  href={ssoHref}
+                  style={{ width: '100%', justifyContent: 'center', marginTop: '0.5rem' }}
+                >
+                  <LogIn size={18} strokeWidth={2} />
+                  <span>{t.hero.ctaLogin}</span>
+                </a>
+                <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>{t.cta.tagline}</span>
               </section>
             </div>
           </div>
@@ -276,7 +288,7 @@ export default function LandingPage({ next, notice, googleLink, googleError, the
             <h2>{t.cta.title}</h2>
             <p>{t.cta.sub}</p>
             <div className="lp-cta__buttons">
-              <a className="lp-btn lp-btn--gold lp-btn--lg" href="#login">
+              <a className="lp-btn lp-btn--gold lp-btn--lg" href={ssoHref}>
                 {t.cta.ctaLogin}
                 <ArrowRight size={18} strokeWidth={2} />
               </a>

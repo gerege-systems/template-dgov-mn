@@ -152,6 +152,18 @@ type Config struct {
 	// томилно (API-аар үүсгэдэггүй). Хэрэглэгч эхлээд бүртгүүлсэн байх ёстой.
 	SuperAdminEmail string `mapstructure:"SUPERADMIN_EMAIL"`
 
+	// Government SSO (sso.dgov.mn, OIDC) — гадаад SSO provider-т нэвтрэх RP (consumer).
+	// ClientID/Secret хоосон бол SSO урсгал inert. RedirectURI нь SSO client-д
+	// бүртгэгдсэн callback (жишээ https://template.dgov.mn/sso/callback) байх ёстой.
+	SSOIssuer       string `mapstructure:"SSO_ISSUER"`
+	SSOClientID     string `mapstructure:"SSO_CLIENT_ID"`
+	SSOClientSecret string `mapstructure:"SSO_CLIENT_SECRET"`
+	SSORedirectURI  string `mapstructure:"SSO_REDIRECT_URI"`
+	SSOScope        string `mapstructure:"SSO_SCOPE"`
+	// SSONativeClientID нь mobile (PKCE, public) урсгалын client_id (хоосон бол
+	// default template-dgov-mn-ios).
+	SSONativeClientID string `mapstructure:"SSO_NATIVE_CLIENT_ID"`
+
 	// --- OIDC PROVIDER тал (sso.dgov.mn нь Ory Hydra-г урдаа тавьж SSO provider
 	// болно). HYDRA_*/SSO_ADMIN_* нь PROVIDER (issuer) тал. ---
 	// HydraAdminURL нь Hydra admin API (client CRUD + login/consent/logout
@@ -435,6 +447,16 @@ func applyDefaults() {
 	}
 	if AppConfig.GSpaceQuota == 0 {
 		AppConfig.GSpaceQuota = 2 << 20 // 2 MB
+	}
+	// Government SSO (RP/consumer) default-ууд.
+	if AppConfig.SSOIssuer == "" {
+		AppConfig.SSOIssuer = "https://sso.dgov.mn"
+	}
+	if AppConfig.SSOScope == "" {
+		AppConfig.SSOScope = "openid profile email"
+	}
+	if AppConfig.SSONativeClientID == "" {
+		AppConfig.SSONativeClientID = "template-dgov-mn-ios"
 	}
 	// OIDC provider тал: Hydra admin URL default нь compose доторх hydra:4445.
 	if AppConfig.HydraAdminURL == "" {

@@ -36,6 +36,7 @@ import (
 	"template/internal/business/usecases/security"
 	"template/internal/business/usecases/sign"
 	siteuc "template/internal/business/usecases/site"
+	"template/internal/business/usecases/sso"
 	"template/internal/business/usecases/superadmin"
 	onboarding "template/internal/business/usecases/superadmin_onboarding"
 	themeuc "template/internal/business/usecases/theme"
@@ -56,6 +57,7 @@ import (
 	recoverypostgres "template/internal/datasources/repositories/postgres/recovery"
 	securitypostgres "template/internal/datasources/repositories/postgres/security"
 	sitepostgres "template/internal/datasources/repositories/postgres/site"
+	ssouserpostgres "template/internal/datasources/repositories/postgres/ssouser"
 	superadminaccountpostgres "template/internal/datasources/repositories/postgres/superadminaccount"
 	superadmininvitepostgres "template/internal/datasources/repositories/postgres/superadmininvite"
 	themepostgres "template/internal/datasources/repositories/postgres/theme"
@@ -77,6 +79,7 @@ import (
 	"template/pkg/jwt"
 	"template/pkg/logger"
 	"template/pkg/observability"
+	"template/pkg/oidc"
 	"template/pkg/verify"
 	"template/pkg/xyp"
 
@@ -228,6 +231,13 @@ func NewApp() (*App, error) {
 
 	// Gerege Core (core.dgov.mn) — USER FIND / ORG FIND хайлтын wrap.
 	coreUC := core.NewUsecase(config.AppConfig.CoreAPIBase, config.AppConfig.CoreAPIToken)
+
+	// Government SSO (sso.dgov.mn, OIDC) — гадаад SSO provider-т нэвтрэх RP урсгал.
+	// Энэ апп нь sso.dgov.mn-ий relying party: нэвтрэлтийг тийш даатгаж, буцаж
+	// ирсэн code-ийг токен болгож солин, хэрэглэгчийг sso_sub-ээр upsert хийнэ.
+	ssoClient := oidc.NewClient(config.AppConfig.SSOIssuer, config.AppConfig.SSOClientID, config.AppConfig.SSOClientSecret, config.AppConfig.SSORedirectURI, config.AppConfig.SSOScope)
+	ssoRepo := ssouserpostgres.NewSSOUserRepository(pool)
+	ssoUC := sso.NewUsecase(ssoClient, ssoRepo, jwtService, redisCache, config.AppConfig.SSONativeClientID)
 
 	// Хэрэглэгчийн гуравдагч этгээдийн интеграци (Google Drive/Meet, Dropbox) —
 	// OAuth токеныг шифрлэн хадгална (RLS-тэй per-user хүснэгт).
@@ -452,6 +462,7 @@ func NewApp() (*App, error) {
 			routes.NewApplicationsRoute(api, applicationsUC, rbacUC, authMiddleware).Routes()
 		}
 		routes.NewCoreRoute(api, coreUC, rbacUC, authMiddleware).Routes()
+		routes.NewSSORoute(api, ssoUC).Routes()
 		routes.NewAdminRoute(api, usersUC, rbacUC, aiUC, authMiddleware).Routes()
 		routes.NewSuperAdminRoute(api, superadminUC, authMiddleware).Routes()
 		// Super admin бүртгэл + MFA — нэвтрээгүй гадаргуу (rate limit + service RLS).
