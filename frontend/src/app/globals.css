@@ -1676,13 +1676,6 @@ html[lang="en"] .i18n-banner { display: block; }
 
 /* ---------- Hero ---------- */
 .lp-hero { position: relative; background: var(--lp-navy); overflow: hidden; }
-/* Утга бүхий hero чимэглэл (цахим засаглалыг бүтээх суурь) — бүх талбайг дүүргэнэ */
-.lp-hero__art {
-  position: absolute; inset: 0;
-  background: url(/hero-art.svg) center center / cover no-repeat;
-  opacity: 0.95;
-  pointer-events: none;
-}
 .lp-hero__pattern {
   position: absolute; inset: 0;
   background-image: radial-gradient(circle at 1px 1px, oklch(100% 0 0 / 0.06) 1px, transparent 0);
@@ -1728,7 +1721,15 @@ html[lang="en"] .i18n-banner { display: block; }
 .lp-stat__label { font-size: 12.5px; color: var(--lp-on-navy-45); }
 
 /* Hero-д шигтгэсэн нэвтрэх карт */
-.lp-hero__visual { position: relative; display: flex; justify-content: center; }
+.lp-hero__visual { position: relative; display: flex; align-items: center; justify-content: center; }
+/* Утга бүхий чимэглэл — текст-тэй нэг түвшинд, баганаа дүүргэнэ */
+.lp-hero__illus {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 620px;
+  filter: drop-shadow(0 24px 60px oklch(15% 0.02 260 / 0.55));
+}
 .lp-hero__login {
   width: 100%; max-width: 480px;
   scroll-margin-top: 84px;

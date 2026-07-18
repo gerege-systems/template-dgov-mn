@@ -78,9 +78,8 @@ export default function LandingPage({ next, themeLanding }: Props) {
       </header>
 
       <main id="top">
-        {/* ---------- Hero (login card шигтгэсэн) ---------- */}
+        {/* ---------- Hero (зүүн: текст · баруун: чимэглэл) ---------- */}
         <section className="lp-hero">
-          <div className="lp-hero__art" aria-hidden="true" />
           <div className="lp-hero__pattern" aria-hidden="true" />
           <div className="lp-hero__inner">
             <div className="lp-hero__copy">
@@ -115,26 +114,10 @@ export default function LandingPage({ next, themeLanding }: Props) {
               </div>
             </div>
 
-            {/* Government SSO (sso.dgov.mn)-оор нэвтрэх карт — hero-ийн баруун талд */}
+            {/* Баруун тал — утга бүхий чимэглэл, текст-тэй нэг түвшинд голлов */}
             <div className="lp-hero__visual">
-              <section
-                id="login"
-                className="signin-card lp-hero__login"
-                aria-labelledby="login-title"
-                style={{ padding: '2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
-              >
-                <h2 id="login-title" style={{ margin: 0, fontSize: '1.25rem' }}>{t.cta.title}</h2>
-                <p style={{ margin: 0, opacity: 0.8 }}>{t.cta.sub}</p>
-                <a
-                  className="lp-btn lp-btn--gold lp-btn--lg"
-                  href={ssoHref}
-                  style={{ width: '100%', justifyContent: 'center', marginTop: '0.5rem' }}
-                >
-                  <LogIn size={18} strokeWidth={2} />
-                  <span>{t.hero.ctaLogin}</span>
-                </a>
-                <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>{t.cta.tagline}</span>
-              </section>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="lp-hero__illus" src="/hero-art.svg" alt="" aria-hidden="true" />
             </div>
           </div>
         </section>
