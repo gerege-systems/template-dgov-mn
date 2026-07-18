@@ -19,9 +19,9 @@ export default function SigninShell({ rightNav, hideFooter, children }: Props) {
       <header className="signin-shell__nav">
         <Link className="topbar__brand" href="/">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="topbar__brand-mark" src="/brand.webp" alt="Цахим засаглалыг бүтээх суурь" />
+          <img className="topbar__brand-mark" src="/brand.webp" alt="Government Template Platform V3.0" />
           <div className="topbar__brand-text">
-            <span className="topbar__brand-name">Цахим засаглалыг бүтээх суурь</span>
+            <span className="topbar__brand-name">Government Template Platform V3.0</span>
           </div>
         </Link>
         {rightNav}

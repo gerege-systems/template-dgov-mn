@@ -57,7 +57,7 @@ export interface LandingCopy {
 }
 
 const mn: LandingCopy = {
-  brand: 'Цахим засаглалыг бүтээх суурь',
+  brand: 'Government Template Platform V3.0',
   nav: { features: 'Боломжууд', security: 'Аюулгүй байдал', tech: 'Технологи', login: 'Нэвтрэх' },
   hero: {
     badge: 'Government Template Platform V3.0 · eID суурьтай · AI-жуулсан',

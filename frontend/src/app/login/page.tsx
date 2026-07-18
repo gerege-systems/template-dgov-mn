@@ -7,7 +7,7 @@ import { safeNext } from '@/lib/navigation';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata = { title: 'Нэвтрэх — Цахим засаглалыг бүтээх суурь' };
+export const metadata = { title: 'Нэвтрэх — Government Template Platform V3.0' };
 
 // Нэвтрэлт нь Government SSO (sso.dgov.mn)-оор дамжина. Товч дарахад sso.dgov.mn
 // руу шилжиж, тэндээ нэвтэрч, буцаж ирнэ (OIDC RP урсгал). SSO callback амжилтгүй

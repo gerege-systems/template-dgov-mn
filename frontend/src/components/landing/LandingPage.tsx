@@ -78,8 +78,9 @@ export default function LandingPage({ next, themeLanding }: Props) {
       </header>
 
       <main id="top">
-        {/* ---------- Hero (зүүн: текст · баруун: чимэглэл) ---------- */}
+        {/* ---------- Hero (зүүн: текст · full-bleed чимэглэл) ---------- */}
         <section className="lp-hero">
+          <div className="lp-hero__art" aria-hidden="true" />
           <div className="lp-hero__pattern" aria-hidden="true" />
           <div className="lp-hero__inner">
             <div className="lp-hero__copy">
@@ -112,12 +113,6 @@ export default function LandingPage({ next, themeLanding }: Props) {
                   </div>
                 ))}
               </div>
-            </div>
-
-            {/* Баруун тал — утга бүхий чимэглэл, текст-тэй нэг түвшинд голлов */}
-            <div className="lp-hero__visual">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="lp-hero__illus" src="/hero-art.svg" alt="" aria-hidden="true" />
             </div>
           </div>
         </section>

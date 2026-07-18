@@ -38,7 +38,7 @@ const sourceSerif = Source_Serif_4({
 });
 
 export const metadata = {
-  title: 'Government Template Platform V3.0 — Цахим засаглалыг бүтээх суурь',
+  title: 'Government Template Platform V3.0',
   description:
     'eID based, AI enabled. Government Template Platform V3.0 — chi (net/http) + pgx дээр суурилсан, төрийн аливаа цахим үйлчилгээг дээр нь босгох, үйлдвэрлэлд бэлэн суурь: eID нэвтрэлт, SSO/OIDC, Gemini AI, аюулгүй байдлын хатуужуулалт нэг дороос.',
 };

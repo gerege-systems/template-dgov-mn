@@ -1566,7 +1566,7 @@ html[lang="en"] .i18n-banner { display: block; }
 .navsearch__empty { padding: 12px; font-size: 13px; color: var(--muted, #6b7280); text-align: center; }
 
 /* ============================================================================
-   Landing (нүүр) — Цахим засаглалыг бүтээх суурь маркетингийн хуудас (.lp-*)
+   Landing (нүүр) — Government Template Platform V3.0 маркетингийн хуудас (.lp-*)
    Брэнд токен (--dan-blue, --gold, --surface, light/dark) дээр найруулав.
    Hero-ийн баруун талд ОДОО БАЙГАА нэвтрэх карт (.signin-card) шигтгэнэ.
    ============================================================================ */
@@ -1676,6 +1676,13 @@ html[lang="en"] .i18n-banner { display: block; }
 
 /* ---------- Hero ---------- */
 .lp-hero { position: relative; background: var(--lp-navy); overflow: hidden; }
+/* Утга бүхий hero чимэглэл (full-bleed) — hero-г бүтэн дүүргэнэ */
+.lp-hero__art {
+  position: absolute; inset: 0;
+  background: url(/hero-art.svg) center center / cover no-repeat;
+  opacity: 0.95;
+  pointer-events: none;
+}
 .lp-hero__pattern {
   position: absolute; inset: 0;
   background-image: radial-gradient(circle at 1px 1px, oklch(100% 0 0 / 0.06) 1px, transparent 0);
@@ -1721,15 +1728,7 @@ html[lang="en"] .i18n-banner { display: block; }
 .lp-stat__label { font-size: 12.5px; color: var(--lp-on-navy-45); }
 
 /* Hero-д шигтгэсэн нэвтрэх карт */
-.lp-hero__visual { position: relative; display: flex; align-items: center; justify-content: center; }
-/* Утга бүхий чимэглэл — текст-тэй нэг түвшинд, баганаа дүүргэнэ */
-.lp-hero__illus {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-width: 620px;
-  filter: drop-shadow(0 24px 60px oklch(15% 0.02 260 / 0.55));
-}
+.lp-hero__visual { position: relative; display: flex; justify-content: center; }
 .lp-hero__login {
   width: 100%; max-width: 480px;
   scroll-margin-top: 84px;
