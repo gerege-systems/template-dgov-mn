@@ -33,12 +33,12 @@ if [[ -n "${SSHPASS:-}" ]] && command -v sshpass >/dev/null 2>&1; then
   SCP=(sshpass -e "${SCP[@]}")
 fi
 
-# 1) mkdocs-material бэлэн эсэхийг хангах (venv, байхгүй бол үүсгэнэ)
+# 1) mkdocs + plugin-ууд бэлэн эсэхийг хангах (venv, байхгүй бол үүсгэнэ)
 if [[ ! -x "$VENV/bin/mkdocs" ]]; then
-  echo "▶ mkdocs-material суулгаж байна (venv: $VENV)…"
+  echo "▶ MkDocs + plugin-ууд суулгаж байна (venv: $VENV)…"
   python3 -m venv "$VENV"
   "$VENV/bin/pip" install --quiet --upgrade pip
-  "$VENV/bin/pip" install --quiet mkdocs-material
+  "$VENV/bin/pip" install --quiet -r "$HERE/requirements.txt"
 fi
 
 # 2) build
