@@ -33,6 +33,7 @@ import (
 	"template/internal/business/usecases/org"
 	provideruc "template/internal/business/usecases/provider"
 	"template/internal/business/usecases/rbac"
+	relayuc "template/internal/business/usecases/relay"
 	"template/internal/business/usecases/security"
 	"template/internal/business/usecases/sign"
 	siteuc "template/internal/business/usecases/site"
@@ -56,6 +57,7 @@ import (
 	orgstamppostgres "template/internal/datasources/repositories/postgres/orgstamp"
 	rbacpostgres "template/internal/datasources/repositories/postgres/rbac"
 	recoverypostgres "template/internal/datasources/repositories/postgres/recovery"
+	relaypostgres "template/internal/datasources/repositories/postgres/relay"
 	securitypostgres "template/internal/datasources/repositories/postgres/security"
 	sitepostgres "template/internal/datasources/repositories/postgres/site"
 	ssotokenpostgres "template/internal/datasources/repositories/postgres/ssotoken"
@@ -101,6 +103,8 @@ type App struct {
 	aiRateLimiter       *middlewares.RateLimiter
 	pollRateLimiter     *middlewares.RateLimiter
 	govWriteRateLimiter *middlewares.RateLimiter
+	relayUC             relayuc.Usecase // SLA worker + demo simulator (background)
+	relayDemo           bool
 }
 
 func NewApp() (*App, error) {
@@ -261,6 +265,9 @@ func NewApp() (*App, error) {
 	// API Gateway — services/routes/consumers/api keys/policies + телеметр.
 	gatewayRepo := gatewaypostgres.NewGatewayRepository(pool)
 	gatewayUC := gateway.NewUsecase(gatewayRepo)
+
+	// Platform-хоорондын хүсэлт дамжуулах + SLA хяналт (relay).
+	relayUC := relayuc.NewUsecase(relaypostgres.NewRelayRepository(pool))
 
 	// Gerege Core (core.dgov.mn) — USER FIND / ORG FIND хайлтын wrap.
 	coreUC := core.NewUsecase(config.AppConfig.CoreAPIBase, config.AppConfig.CoreAPIToken)
@@ -492,6 +499,9 @@ func NewApp() (*App, error) {
 		routes.NewAssetsRoute(api, assetsUC, authMiddleware, govWriteRateLimiter).Routes()
 		routes.NewGSpaceRoute(api, gspaceUC, authMiddleware, govWriteRateLimiter).Routes()
 		routes.NewGatewayRoute(api, gatewayUC, rbacUC, authMiddleware).Routes()
+		// Хүсэлт дамжуулах + SLA хяналт (JWT + relay эрх). SLA sweep + demo
+		// simulator/generator нь App.Run-д background-аар ажиллана.
+		routes.NewRelayRoute(api, relayUC, rbacUC, authMiddleware).Routes()
 		if applicationsUC != nil {
 			routes.NewApplicationsRoute(api, applicationsUC, rbacUC, authMiddleware).Routes()
 		}
@@ -570,11 +580,47 @@ func NewApp() (*App, error) {
 		aiRateLimiter:       aiRateLimiter,
 		pollRateLimiter:     pollRateLimiter,
 		govWriteRateLimiter: govWriteRateLimiter,
+		relayUC:             relayUC,
+		relayDemo:           config.AppConfig.RelayDemoMode,
 	}, nil
+}
+
+// startRelayWorkers нь SLA хяналтын background goroutine-уудыг эхлүүлнэ: sweep
+// (reminder/overdue/breach/escalate) 30с тутам; demo simulator (RELAY_DEMO_MODE)
+// 10с тутам доод platform-уудын хариуг дуурайна. ctx cancel болоход зогсоно.
+func (a *App) startRelayWorkers(ctx context.Context) {
+	if a.relayUC == nil {
+		return
+	}
+	tick := func(every time.Duration, fn func(context.Context)) {
+		t := time.NewTicker(every)
+		defer t.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-t.C:
+				// Алхмын context-ыг worker context-оос гаргана — shutdown үед
+				// явж буй алхам ч цуцлагдана.
+				stepCtx, cancel := context.WithTimeout(ctx, 20*time.Second)
+				fn(stepCtx)
+				cancel()
+			}
+		}
+	}
+	go tick(20*time.Second, func(c context.Context) { _ = a.relayUC.SLASweep(c) })
+	if a.relayDemo {
+		go tick(10*time.Second, a.relayUC.SimulateStep)   // доод platform-уудын хариу дуурайх
+		go tick(25*time.Second, a.relayUC.SimulateIngest) // шинэ демо хүсэлт үүсгэх
+	}
 }
 
 func (a *App) Run() (err error) {
 	srvLog := logger.WithFields(logger.Fields{constants.LoggerCategory: constants.LoggerCategoryServer})
+
+	// SLA хяналтын background worker-ууд — shutdown үед workerCtx cancel болж зогсоно.
+	workerCtx, stopWorkers := context.WithCancel(context.Background())
+	a.startRelayWorkers(workerCtx)
 
 	go func() {
 		srvLog.Infof("success to listen and serve on %s", a.server.Addr)
@@ -588,6 +634,7 @@ func (a *App) Run() (err error) {
 
 	<-quit
 	srvLog.Info("shutdown server ...")
+	stopWorkers()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

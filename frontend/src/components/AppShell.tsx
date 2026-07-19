@@ -112,6 +112,13 @@ const SYSTEMS: NavSystem[] = [
         ],
       },
       {
+        labelKey: 'group.relay',
+        items: [
+          { href: '/admin/relay', labelKey: 'nav.relayDashboard', icon: Gauge, perm: 'relay.view' },
+          { href: '/admin/relay/config', labelKey: 'nav.relayConfig', icon: Building2, perm: 'relay.manage' },
+        ],
+      },
+      {
         labelKey: 'group.security',
         items: [
           { href: '/admin/audit', labelKey: 'nav.audit', icon: ScrollText },

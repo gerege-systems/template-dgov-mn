@@ -451,6 +451,69 @@ definitions:
     - password
     - username
     type: object
+  template_internal_http_datatransfers_requests.RelayIngestRequest:
+    properties:
+      due_at:
+        type: string
+      external_ref:
+        type: string
+      payload:
+        items:
+          type: integer
+        type: array
+      priority:
+        type: string
+      service_code:
+        type: string
+      source_platform:
+        type: string
+      title:
+        type: string
+    required:
+    - service_code
+    type: object
+  template_internal_http_datatransfers_requests.RelayPlatformRequest:
+    properties:
+      code:
+        type: string
+      enabled:
+        type: boolean
+      endpoint_url:
+        type: string
+      name:
+        type: string
+      supervisor_contact:
+        type: string
+    required:
+    - code
+    - name
+    type: object
+  template_internal_http_datatransfers_requests.RelayRespondRequest:
+    properties:
+      result:
+        items:
+          type: integer
+        type: array
+      status:
+        enum:
+        - done
+        - rejected
+        type: string
+    required:
+    - status
+    type: object
+  template_internal_http_datatransfers_requests.RelayRouteRequest:
+    properties:
+      platform_id:
+        type: string
+      service_code:
+        type: string
+      sla_minutes:
+        type: integer
+    required:
+    - platform_id
+    - service_code
+    type: object
   template_internal_http_datatransfers_requests.ResetPasswordRequest:
     properties:
       code:
@@ -1085,6 +1148,147 @@ definitions:
         items:
           $ref: '#/definitions/template_internal_http_datatransfers_responses.OrgSignerResponse'
         type: array
+    type: object
+  template_internal_http_datatransfers_responses.RelayAssignmentResponse:
+    properties:
+      dispatched_at:
+        type: string
+      due_at:
+        type: string
+      escalated:
+        type: boolean
+      id:
+        type: string
+      platform_id:
+        type: string
+      platform_name:
+        type: string
+      reminders_sent:
+        type: integer
+      request_id:
+        type: string
+      responded_at:
+        type: string
+      result:
+        items:
+          type: integer
+        type: array
+      status:
+        type: string
+    type: object
+  template_internal_http_datatransfers_responses.RelayEventResponse:
+    properties:
+      assignment_id:
+        type: string
+      created_at:
+        type: string
+      detail:
+        type: string
+      id:
+        type: string
+      request_id:
+        type: string
+      type:
+        type: string
+    type: object
+  template_internal_http_datatransfers_responses.RelayOverviewResponse:
+    properties:
+      avg_fulfill_mins:
+        type: integer
+      fulfilled:
+        type: integer
+      in_progress:
+        type: integer
+      overdue:
+        type: integer
+      platforms:
+        items:
+          $ref: '#/definitions/template_internal_http_datatransfers_responses.RelayPlatformStatResponse'
+        type: array
+      received_today:
+        type: integer
+      recent_events:
+        items:
+          $ref: '#/definitions/template_internal_http_datatransfers_responses.RelayEventResponse'
+        type: array
+      sla_compliance_pct:
+        type: number
+      status_buckets:
+        items:
+          $ref: '#/definitions/template_internal_http_datatransfers_responses.RelayStatusBucketResponse'
+        type: array
+      total:
+        type: integer
+    type: object
+  template_internal_http_datatransfers_responses.RelayPlatformStatResponse:
+    properties:
+      compliance_pct:
+        type: number
+      done:
+        type: integer
+      overdue:
+        type: integer
+      pending:
+        type: integer
+      platform_id:
+        type: string
+      platform_name:
+        type: string
+      total:
+        type: integer
+    type: object
+  template_internal_http_datatransfers_responses.RelayRequestDetailResponse:
+    properties:
+      assignments:
+        items:
+          $ref: '#/definitions/template_internal_http_datatransfers_responses.RelayAssignmentResponse'
+        type: array
+      events:
+        items:
+          $ref: '#/definitions/template_internal_http_datatransfers_responses.RelayEventResponse'
+        type: array
+      request:
+        $ref: '#/definitions/template_internal_http_datatransfers_responses.RelayRequestResponse'
+    type: object
+  template_internal_http_datatransfers_responses.RelayRequestResponse:
+    properties:
+      breach_notified:
+        type: boolean
+      due_at:
+        type: string
+      external_ref:
+        type: string
+      fulfilled_at:
+        type: string
+      id:
+        type: string
+      payload:
+        items:
+          type: integer
+        type: array
+      priority:
+        type: string
+      received_at:
+        type: string
+      result:
+        items:
+          type: integer
+        type: array
+      service_code:
+        type: string
+      source_platform:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+    type: object
+  template_internal_http_datatransfers_responses.RelayStatusBucketResponse:
+    properties:
+      count:
+        type: integer
+      status:
+        type: string
     type: object
   template_internal_http_datatransfers_responses.SecurityEventResponse:
     properties:
@@ -2953,6 +3157,238 @@ paths:
       summary: Гарын үсэг (eID) хадгалах
       tags:
       - users
+  /relay/assignments/{id}/respond:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Assignment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Хариу
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/template_internal_http_datatransfers_requests.RelayRespondRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/template_internal_http_handlers_v1.BaseResponse'
+      security:
+      - BearerAuth: []
+      summary: Доод platform-ын callback — даалгаврын хариу
+      tags:
+      - relay
+  /relay/overview:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/template_internal_http_handlers_v1.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/template_internal_http_datatransfers_responses.RelayOverviewResponse'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: SLA хяналтын самбарын нэгтгэл
+      tags:
+      - relay
+  /relay/platforms:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/template_internal_http_handlers_v1.BaseResponse'
+      security:
+      - BearerAuth: []
+      summary: Доод platform-уудыг жагсаах
+      tags:
+      - relay
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Platform
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/template_internal_http_datatransfers_requests.RelayPlatformRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/template_internal_http_handlers_v1.BaseResponse'
+      security:
+      - BearerAuth: []
+      summary: Доод platform бүртгэх
+      tags:
+      - relay
+  /relay/platforms/{id}:
+    delete:
+      parameters:
+      - description: Platform ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/template_internal_http_handlers_v1.BaseResponse'
+      security:
+      - BearerAuth: []
+      summary: Доод platform устгах
+      tags:
+      - relay
+  /relay/requests:
+    get:
+      parameters:
+      - description: Max rows (default 50, max 200)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/template_internal_http_handlers_v1.BaseResponse'
+      security:
+      - BearerAuth: []
+      summary: Хүсэлтүүдийн жагсаалт
+      tags:
+      - relay
+    post:
+      consumes:
+      - application/json
+      description: service_code-ийн routing дүрмээр доод platform-ууд руу дамжуулж,
+        SLA хяналтад авна.
+      parameters:
+      - description: Хүсэлт
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/template_internal_http_datatransfers_requests.RelayIngestRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/template_internal_http_handlers_v1.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/template_internal_http_datatransfers_responses.RelayRequestResponse'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Дээд platform-оос хугацаатай үйлчилгээний хүсэлт хүлээж авах
+      tags:
+      - relay
+  /relay/requests/{id}:
+    get:
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/template_internal_http_handlers_v1.BaseResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/template_internal_http_datatransfers_responses.RelayRequestDetailResponse'
+              type: object
+      security:
+      - BearerAuth: []
+      summary: Хүсэлтийн дэлгэрэнгүй (assignments + timeline)
+      tags:
+      - relay
+  /relay/routes:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/template_internal_http_handlers_v1.BaseResponse'
+      security:
+      - BearerAuth: []
+      summary: Чиглүүлэлтийн дүрмүүдийг жагсаах
+      tags:
+      - relay
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Route
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/template_internal_http_datatransfers_requests.RelayRouteRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/template_internal_http_handlers_v1.BaseResponse'
+      security:
+      - BearerAuth: []
+      summary: Чиглүүлэлт үүсгэх (service_code → platform)
+      tags:
+      - relay
+  /relay/routes/{id}:
+    delete:
+      parameters:
+      - description: Route ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/template_internal_http_handlers_v1.BaseResponse'
+      security:
+      - BearerAuth: []
+      summary: Чиглүүлэлт устгах
+      tags:
+      - relay
   /site/appearance:
     get:
       description: Landing болон нийтийн хуудсанд хэрэглэх нийтийн харагдац (accent

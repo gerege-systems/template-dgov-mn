@@ -2470,6 +2470,399 @@ const docTemplate = `{
                 }
             }
         },
+        "/relay/assignments/{id}/respond": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "relay"
+                ],
+                "summary": "Доод platform-ын callback — даалгаврын хариу",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Assignment ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Хариу",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/template_internal_http_datatransfers_requests.RelayRespondRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/template_internal_http_handlers_v1.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/relay/overview": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "relay"
+                ],
+                "summary": "SLA хяналтын самбарын нэгтгэл",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/template_internal_http_handlers_v1.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/template_internal_http_datatransfers_responses.RelayOverviewResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/relay/platforms": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "relay"
+                ],
+                "summary": "Доод platform-уудыг жагсаах",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/template_internal_http_handlers_v1.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "relay"
+                ],
+                "summary": "Доод platform бүртгэх",
+                "parameters": [
+                    {
+                        "description": "Platform",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/template_internal_http_datatransfers_requests.RelayPlatformRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/template_internal_http_handlers_v1.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/relay/platforms/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "relay"
+                ],
+                "summary": "Доод platform устгах",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Platform ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/template_internal_http_handlers_v1.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/relay/requests": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "relay"
+                ],
+                "summary": "Хүсэлтүүдийн жагсаалт",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Max rows (default 50, max 200)",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/template_internal_http_handlers_v1.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "service_code-ийн routing дүрмээр доод platform-ууд руу дамжуулж, SLA хяналтад авна.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "relay"
+                ],
+                "summary": "Дээд platform-оос хугацаатай үйлчилгээний хүсэлт хүлээж авах",
+                "parameters": [
+                    {
+                        "description": "Хүсэлт",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/template_internal_http_datatransfers_requests.RelayIngestRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/template_internal_http_handlers_v1.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/template_internal_http_datatransfers_responses.RelayRequestResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/relay/requests/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "relay"
+                ],
+                "summary": "Хүсэлтийн дэлгэрэнгүй (assignments + timeline)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Request ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/template_internal_http_handlers_v1.BaseResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/template_internal_http_datatransfers_responses.RelayRequestDetailResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/relay/routes": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "relay"
+                ],
+                "summary": "Чиглүүлэлтийн дүрмүүдийг жагсаах",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/template_internal_http_handlers_v1.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "relay"
+                ],
+                "summary": "Чиглүүлэлт үүсгэх (service_code → platform)",
+                "parameters": [
+                    {
+                        "description": "Route",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/template_internal_http_datatransfers_requests.RelayRouteRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/template_internal_http_handlers_v1.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/relay/routes/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "relay"
+                ],
+                "summary": "Чиглүүлэлт устгах",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Route ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/template_internal_http_handlers_v1.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/site/appearance": {
             "get": {
                 "description": "Landing болон нийтийн хуудсанд хэрэглэх нийтийн харагдац (accent · font · style · theme). Нэвтрэлт шаардахгүй.",
@@ -6207,6 +6600,101 @@ const docTemplate = `{
                 }
             }
         },
+        "template_internal_http_datatransfers_requests.RelayIngestRequest": {
+            "type": "object",
+            "required": [
+                "service_code"
+            ],
+            "properties": {
+                "due_at": {
+                    "type": "string"
+                },
+                "external_ref": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "priority": {
+                    "type": "string"
+                },
+                "service_code": {
+                    "type": "string"
+                },
+                "source_platform": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "template_internal_http_datatransfers_requests.RelayPlatformRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "name"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "endpoint_url": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "supervisor_contact": {
+                    "type": "string"
+                }
+            }
+        },
+        "template_internal_http_datatransfers_requests.RelayRespondRequest": {
+            "type": "object",
+            "required": [
+                "status"
+            ],
+            "properties": {
+                "result": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "done",
+                        "rejected"
+                    ]
+                }
+            }
+        },
+        "template_internal_http_datatransfers_requests.RelayRouteRequest": {
+            "type": "object",
+            "required": [
+                "platform_id",
+                "service_code"
+            ],
+            "properties": {
+                "platform_id": {
+                    "type": "string"
+                },
+                "service_code": {
+                    "type": "string"
+                },
+                "sla_minutes": {
+                    "type": "integer"
+                }
+            }
+        },
         "template_internal_http_datatransfers_requests.ResetPasswordRequest": {
             "type": "object",
             "required": [
@@ -7147,6 +7635,221 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/template_internal_http_datatransfers_responses.OrgSignerResponse"
                     }
+                }
+            }
+        },
+        "template_internal_http_datatransfers_responses.RelayAssignmentResponse": {
+            "type": "object",
+            "properties": {
+                "dispatched_at": {
+                    "type": "string"
+                },
+                "due_at": {
+                    "type": "string"
+                },
+                "escalated": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "platform_id": {
+                    "type": "string"
+                },
+                "platform_name": {
+                    "type": "string"
+                },
+                "reminders_sent": {
+                    "type": "integer"
+                },
+                "request_id": {
+                    "type": "string"
+                },
+                "responded_at": {
+                    "type": "string"
+                },
+                "result": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "template_internal_http_datatransfers_responses.RelayEventResponse": {
+            "type": "object",
+            "properties": {
+                "assignment_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "detail": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "request_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "template_internal_http_datatransfers_responses.RelayOverviewResponse": {
+            "type": "object",
+            "properties": {
+                "avg_fulfill_mins": {
+                    "type": "integer"
+                },
+                "fulfilled": {
+                    "type": "integer"
+                },
+                "in_progress": {
+                    "type": "integer"
+                },
+                "overdue": {
+                    "type": "integer"
+                },
+                "platforms": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/template_internal_http_datatransfers_responses.RelayPlatformStatResponse"
+                    }
+                },
+                "received_today": {
+                    "type": "integer"
+                },
+                "recent_events": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/template_internal_http_datatransfers_responses.RelayEventResponse"
+                    }
+                },
+                "sla_compliance_pct": {
+                    "type": "number"
+                },
+                "status_buckets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/template_internal_http_datatransfers_responses.RelayStatusBucketResponse"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "template_internal_http_datatransfers_responses.RelayPlatformStatResponse": {
+            "type": "object",
+            "properties": {
+                "compliance_pct": {
+                    "type": "number"
+                },
+                "done": {
+                    "type": "integer"
+                },
+                "overdue": {
+                    "type": "integer"
+                },
+                "pending": {
+                    "type": "integer"
+                },
+                "platform_id": {
+                    "type": "string"
+                },
+                "platform_name": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "template_internal_http_datatransfers_responses.RelayRequestDetailResponse": {
+            "type": "object",
+            "properties": {
+                "assignments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/template_internal_http_datatransfers_responses.RelayAssignmentResponse"
+                    }
+                },
+                "events": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/template_internal_http_datatransfers_responses.RelayEventResponse"
+                    }
+                },
+                "request": {
+                    "$ref": "#/definitions/template_internal_http_datatransfers_responses.RelayRequestResponse"
+                }
+            }
+        },
+        "template_internal_http_datatransfers_responses.RelayRequestResponse": {
+            "type": "object",
+            "properties": {
+                "breach_notified": {
+                    "type": "boolean"
+                },
+                "due_at": {
+                    "type": "string"
+                },
+                "external_ref": {
+                    "type": "string"
+                },
+                "fulfilled_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "priority": {
+                    "type": "string"
+                },
+                "received_at": {
+                    "type": "string"
+                },
+                "result": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "service_code": {
+                    "type": "string"
+                },
+                "source_platform": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "template_internal_http_datatransfers_responses.RelayStatusBucketResponse": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },

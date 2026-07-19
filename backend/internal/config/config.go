@@ -171,6 +171,12 @@ type Config struct {
 	// SSO refresh token шаардана.
 	SSOEidProxyBaseURL string `mapstructure:"SSO_EID_PROXY_BASE_URL"`
 
+	// RelayDemoMode нь platform-хоорондын хүсэлт дамжуулах feature-ийн demo
+	// simulator-ыг идэвхжүүлнэ — доод platform-уудын нэрийн өмнөөс хариу үүсгэж,
+	// SLA dashboard-ыг өөрөө хөдөлгөнө. Production-д бодит доод platform-ууд
+	// callback хийдэг тул унтраана (false).
+	RelayDemoMode bool `mapstructure:"RELAY_DEMO_MODE"`
+
 	// --- OIDC PROVIDER тал (sso.dgov.mn нь Ory Hydra-г урдаа тавьж SSO provider
 	// болно). HYDRA_*/SSO_ADMIN_* нь PROVIDER (issuer) тал. ---
 	// HydraAdminURL нь Hydra admin API (client CRUD + login/consent/logout
@@ -290,6 +296,8 @@ func InitializeAppConfig() error {
 	_ = viper.BindEnv("SSO_ADMIN_API_KEYS")
 	_ = viper.BindEnv("SSO_ADMIN_SUBS")
 	_ = viper.BindEnv("SIGN_RELAY_TOKEN")
+	_ = viper.BindEnv("SSO_EID_PROXY_BASE_URL")
+	_ = viper.BindEnv("RELAY_DEMO_MODE")
 	// .env файл байхгүй байх нь алдаа БИШ — контейнер / 12-factor орчинд
 	// тохиргоог зөвхөн environment-ээс уншина. Зөвхөн жинхэнэ задлан унших
 	// (parse) алдааг л буцаана.
@@ -395,6 +403,11 @@ func sslModeOf(conn string) string {
 
 // applyDefaults нь сонголттой config утгуудад зохистой анхдагч утгуудыг олгоно.
 func applyDefaults() {
+	// RELAY_DEMO_MODE default = true (template scaffold): тодорхой унтраагаагүй
+	// бол demo simulator идэвхтэй.
+	if !viper.IsSet("RELAY_DEMO_MODE") {
+		AppConfig.RelayDemoMode = true
+	}
 	if AppConfig.DBMaxOpenConns == 0 {
 		AppConfig.DBMaxOpenConns = 25
 	}
