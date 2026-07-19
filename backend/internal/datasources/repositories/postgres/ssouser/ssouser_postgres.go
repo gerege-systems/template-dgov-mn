@@ -100,6 +100,42 @@ func (r *ssoUserRepository) UpsertBySSOSub(ctx context.Context, ssoSub string, i
 func (r *ssoUserRepository) UpsertByCivilID(ctx context.Context, civilID, nationalID, ssoSub string, in *domain.User) (domain.User, error) {
 	var stored records.Users
 	err := r.withRLS(ctx, func(tx pgx.Tx) error {
+		// Эхлээд: civil_id-гүй байсан ПАЙРВАЙЗ (sso_sub) мөр байвал түүнд civil_id/
+		// national_id-ыг нэмж "дэвшүүлнэ". Ингэснээр иргэн урьд SSO-гоор
+		// nationalid scope-ГҮЙ нэвтэрч (sso_sub мөр үүсгээд) дараа nationalid-тай
+		// эргэж ирэхэд доорх INSERT нь давхардсан sso_sub-д мөргөлдөхгүй.
+		promoteRows, pErr := tx.Query(ctx, `
+			UPDATE users SET
+				civil_id       = $2,
+				national_id    = $3,
+				first_name     = COALESCE(NULLIF($4,''), first_name),
+				last_name      = COALESCE(NULLIF($5,''), last_name),
+				first_name_en  = COALESCE(NULLIF($6,''), first_name_en),
+				last_name_en   = COALESCE(NULLIF($7,''), last_name_en),
+				google_sub     = COALESCE(NULLIF($8,''), google_sub),
+				google_email   = COALESCE(NULLIF($9,''), google_email),
+				google_name    = COALESCE(NULLIF($10,''), google_name),
+				google_picture = COALESCE(NULLIF($11,''), google_picture),
+				active         = true,
+				updated_at     = now()
+			WHERE sso_sub = $1 AND (civil_id IS NULL OR civil_id = '')
+			RETURNING `+records.UserColumns+`
+		`, ssoSub, civilID, nationalID, in.FirstName, in.LastName, in.FirstNameEn, in.LastNameEn,
+			in.GoogleSub, in.GoogleEmail, in.GoogleName, in.GooglePicture)
+		if pErr != nil {
+			return pErr
+		}
+		promoted, pScanErr := pgx.CollectRows(promoteRows, pgx.RowToStructByName[records.Users])
+		if pScanErr != nil {
+			return pScanErr
+		}
+		if len(promoted) == 1 {
+			stored = promoted[0]
+			return nil
+		}
+
+		// Пайрвайз мөр байхгүй — civil_id-ээр INSERT/merge (шинэ иргэн эсвэл eID-
+		// ээр урьд бүртгэгдсэн мөртэй нэгтгэх).
 		rows, qErr := tx.Query(ctx, `
 			INSERT INTO users(id, username, first_name, last_name, first_name_en, last_name_en, email, password, active, role_id, national_id, civil_id, sso_sub, google_sub, google_email, google_name, google_picture, created_at)
 			VALUES (uuid_generate_v4(), $1, $2, $3, $4, $5, NULL, NULL, true, $6, $7, $8, $9, NULLIF($10,''), NULLIF($11,''), NULLIF($12,''), NULLIF($13,''), now())
