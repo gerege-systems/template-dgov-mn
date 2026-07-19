@@ -7139,6 +7139,11 @@ const docTemplate = `{
                 "doc_text": {
                     "type": "string"
                 },
+                "extra": {
+                    "description": "activity service-ийн нэмэлт талбарууд",
+                    "type": "object",
+                    "additionalProperties": {}
+                },
                 "flow": {
                     "type": "string"
                 },
@@ -7306,6 +7311,11 @@ const docTemplate = `{
                 },
                 "enrolled_at": {
                     "type": "string"
+                },
+                "extra": {
+                    "description": "upstream-ийн нэмэлт талбарууд",
+                    "type": "object",
+                    "additionalProperties": {}
                 },
                 "platform": {
                     "type": "string"

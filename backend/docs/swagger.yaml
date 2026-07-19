@@ -818,6 +818,10 @@ definitions:
     properties:
       doc_text:
         type: string
+      extra:
+        additionalProperties: {}
+        description: activity service-ийн нэмэлт талбарууд
+        type: object
       flow:
         type: string
       outcome:
@@ -928,6 +932,10 @@ definitions:
         type: string
       enrolled_at:
         type: string
+      extra:
+        additionalProperties: {}
+        description: upstream-ийн нэмэлт талбарууд
+        type: object
       platform:
         type: string
     type: object

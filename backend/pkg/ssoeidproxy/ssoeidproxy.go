@@ -194,11 +194,12 @@ func (c *Client) Certificates(ctx context.Context, accessToken string) (*eid.Per
 }
 
 type wireDevice struct {
-	DocumentNumber string     `json:"document_number"`
-	Platform       string     `json:"platform"`
-	EnrolledAt     *time.Time `json:"enrolled_at"`
-	Active         bool       `json:"active"`
-	DeactivatedAt  *time.Time `json:"deactivated_at"`
+	DocumentNumber string         `json:"document_number"`
+	Platform       string         `json:"platform"`
+	EnrolledAt     *time.Time     `json:"enrolled_at"`
+	Active         bool           `json:"active"`
+	DeactivatedAt  *time.Time     `json:"deactivated_at"`
+	Extra          map[string]any `json:"extra"` // SSO proxy-ийн дамжуулсан нэмэлт талбарууд
 }
 
 type wireDevices struct {
@@ -218,17 +219,19 @@ func (c *Client) Devices(ctx context.Context, accessToken string) (*eid.PersonDe
 		devices = append(devices, eid.PersonDeviceItem{
 			DocumentNumber: x.DocumentNumber, Platform: x.Platform,
 			EnrolledAt: ts(x.EnrolledAt), Active: x.Active, DeactivatedAt: x.DeactivatedAt,
+			Extra: x.Extra,
 		})
 	}
 	return &eid.PersonDevices{Devices: devices, ActiveCount: w.ActiveCount, Total: w.Total}, nil
 }
 
 type wireActivityItem struct {
-	SessionID string     `json:"session_id"`
-	Flow      string     `json:"flow"`
-	Outcome   string     `json:"outcome"`
-	DocText   string     `json:"doc_text"`
-	Timestamp *time.Time `json:"timestamp"`
+	SessionID string         `json:"session_id"`
+	Flow      string         `json:"flow"`
+	Outcome   string         `json:"outcome"`
+	DocText   string         `json:"doc_text"`
+	Timestamp *time.Time     `json:"timestamp"`
+	Extra     map[string]any `json:"extra"` // SSO proxy-ийн дамжуулсан нэмэлт талбарууд
 }
 
 type wireActivity struct {
@@ -258,7 +261,7 @@ func (c *Client) Activity(ctx context.Context, accessToken string, limit, offset
 	for _, x := range w.Sessions {
 		sessions = append(sessions, eid.PersonActivityItem{
 			SessionID: x.SessionID, Flow: x.Flow, Outcome: x.Outcome,
-			DocText: x.DocText, Timestamp: ts(x.Timestamp),
+			DocText: x.DocText, Timestamp: ts(x.Timestamp), Extra: x.Extra,
 		})
 	}
 	return &eid.PersonActivity{
