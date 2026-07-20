@@ -1388,8 +1388,8 @@ html[lang="en"] .i18n-banner { display: block; }
 
 @media (max-width: 900px) {
   /* Mobile: maincol нь бүтэн өргөн; iconrail-ийг доод tab bar орлоно, sidepanel
-     нь идэвхтэй системийн хуудсуудыг доороос дэлгэдэг bottom sheet болно —
-     контентыг шахахгүй (өмнө нь grid шахагдаж контент харагдахгүй болдог байсан).
+     нь идэвхтэй системийн хуудсуудыг зүүн дээд hamburger-ээр нээгддэг зүүн drawer
+     болно — контентыг шахахгүй (өмнө нь grid шахагдаж контент харагдахгүй байсан).
      .is-collapsed-ийн (0,2,0) specificity-г давахын тулд хоёуланг нь дурдана —
      эс бол mobile дээр maincol нарийн зурвас болж контент шахагддаг. */
   .shell2,
@@ -1402,27 +1402,31 @@ html[lang="en"] .i18n-banner { display: block; }
     padding-bottom: calc(var(--bottombar-h) + env(safe-area-inset-bottom, 0px) + 28px);
   }
   .iconrail { display: none; }
-  .topbar2__toggle { display: none; }
+  /* зүүн дээд булангийн hamburger — идэвхтэй системийн хуудсын цэсийг нээнэ.
+     (base дээр аль хэдийн display:flex — desktop-т grid баганыг toggle-дэнэ.) */
 
-  /* sidepanel → доороос гулсдаг bottom sheet */
+  /* sidepanel → зүүн талаас гулсдаг drawer (hamburger-ээр нээгдэнэ).
+     Bottom sheet биш — доод tab bar болон backdrop-оос дээр байрлана. */
   .sidepanel {
     position: fixed;
+    top: 0;
+    bottom: 0;
     left: 0;
-    right: 0;
-    top: auto;
-    width: auto;
-    bottom: calc(var(--bottombar-h) + env(safe-area-inset-bottom, 0px));
-    max-height: 68vh;
+    right: auto;
+    width: min(280px, 82vw);
+    max-height: none;
     overflow-y: auto;
-    z-index: 65;
-    border-right: 0;
-    border-top: 1px solid var(--border);
-    border-radius: 16px 16px 0 0;
-    box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.16);
-    transform: translateY(120%);
+    z-index: 85;
+    border-right: 1px solid var(--border);
+    border-top: 0;
+    border-radius: 0;
+    box-shadow: 8px 0 28px rgba(0, 0, 0, 0.18);
+    transform: translateX(-100%);
     transition: transform 0.24s ease;
   }
-  .shell2:not(.is-collapsed) .sidepanel { transform: translateY(0); }
+  .shell2:not(.is-collapsed) .sidepanel { transform: translateX(0); }
+  /* backdrop нь доод tab bar-аас дээр (доод bar-ыг ч бүрхэнэ) */
+  .shell2__backdrop { z-index: 80; }
   .shell2:not(.is-collapsed) .shell2__backdrop { display: block; }
 
   /* доод tab bar — фиксэд, viewport-ийн доод ирмэгт */
