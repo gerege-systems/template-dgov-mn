@@ -10,7 +10,7 @@
 <div class="grid cards" markdown>
 
 - :material-shield-key: **eID + Government SSO**  
-  Цахим үнэмлэг (eID)-т суурилсан нэвтрэлт + OpenID Connect (Ory Hydra) SSO
+  Цахим үнэмлэх (eID)-т суурилсан нэвтрэлт + OpenID Connect (Ory Hydra) SSO
   провайдер. Апп-ууд нэг товшилтоор холбогдоно.
 
 - :material-layers: **Цэвэр архитектур**  

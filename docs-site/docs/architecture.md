@@ -24,7 +24,7 @@ Internet ──► nginx (TLS)
 | **Backend** | Go · chi (net/http) · pgx (ORM-гүй) | Clean Architecture, RLS, hand-written SQL |
 | **Frontend** | Next.js 15 (BFF) | Браузер зөвхөн ижил-origin route-той харилцана; токен client JS-д гардаггүй |
 | **OIDC provider** | Ory Hydra | login/consent/logout урсгалыг платформ өөрөө жолоодоно |
-| **Identity** | eID Mongolia RP | Цахим үнэмлэгээр баталгаажуулалт |
+| **Identity** | eID Mongolia RP | Цахим үнэмлэхээр баталгаажуулалт |
 | **Cache/queue** | Redis | session deny-list, transient state |
 | **AI** | Gemini (SDK-гүй REST) | чат, дуу хоолой, орчуулга |
 
