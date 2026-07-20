@@ -1357,8 +1357,11 @@ html[lang="en"] .i18n-banner { display: block; }
 @media (max-width: 900px) {
   /* Mobile: maincol нь бүтэн өргөн; iconrail-ийг доод tab bar орлоно, sidepanel
      нь идэвхтэй системийн хуудсуудыг доороос дэлгэдэг bottom sheet болно —
-     контентыг шахахгүй (өмнө нь grid шахагдаж контент харагдахгүй болдог байсан). */
-  .shell2 { grid-template-columns: 1fr; }
+     контентыг шахахгүй (өмнө нь grid шахагдаж контент харагдахгүй болдог байсан).
+     .is-collapsed-ийн (0,2,0) specificity-г давахын тулд хоёуланг нь дурдана —
+     эс бол mobile дээр maincol нарийн зурвас болж контент шахагддаг. */
+  .shell2,
+  .shell2.is-collapsed { grid-template-columns: 1fr; }
   /* Хэвтээ гүйлгэлтээс сэргийлэх сүүлчийн хамгаалалт — дотоод гүйлгэдэг сав
      (жишээ нь .users-table-wrap) өөрийн overflow-x-оор ажиллана. Доод tab bar-т
      дарагдахгүйн тулд доор нь зай үлдээнэ. */
