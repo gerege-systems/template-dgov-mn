@@ -1302,6 +1302,38 @@ html[lang="en"] .i18n-banner { display: block; }
 .rbac-perm-label { display: flex; flex-direction: column; gap: 1px; align-items: flex-start; }
 .rbac-perm-label small { color: var(--faint); font-size: 11px; }
 
+/* ---------- Responsive tables ---------- */
+/* Бүх хүснэгт өөрийн саван дотор (.users-table-wrap эсвэл overflowX:auto .card)
+   хэвтээ гүйлгэгддэг. Mobile дээр багануудыг битүү шахаж (текст эвдрэн мөр
+   таслахаас) сэргийлж nowrap хийж, savandaa цэвэр гүйлгэгдэнэ — ирмэг дээр
+   хагас харагдах багана "баруун тийш гүйлгэ" гэсэн дохио болно. */
+.users-table-wrap { -webkit-overflow-scrolling: touch; }
+
+@media (max-width: 720px) {
+  .users-table,
+  .dtable,
+  .rbac-matrix { font-size: 13px; }
+
+  .users-table th,
+  .users-table td,
+  .dtable thead th,
+  .dtable tbody td,
+  .rbac-matrix th,
+  .rbac-matrix td {
+    padding: 9px 11px;
+    white-space: nowrap;
+  }
+
+  /* Урт чөлөөт текст (лог мессеж, дэлгэрэнгүй) — хэт өргөсгөхгүйгээр таслуулах.
+     Тухайн td-д className="cell-wrap" өгвөл мөр таслаж, дээд хязгаартай болно. */
+  .users-table td.cell-wrap,
+  .dtable tbody td.cell-wrap {
+    white-space: normal;
+    min-width: 200px;
+    max-width: 260px;
+  }
+}
+
 .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 22px; }
 .stat-card { padding: 18px; }
 .stat-card__value { font-family: var(--font-display); font-size: 30px; font-weight: 700; color: var(--fg); }
