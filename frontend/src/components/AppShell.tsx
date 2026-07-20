@@ -256,6 +256,12 @@ export default function AppShell({ user, children }: Props) {
     if (typeof window !== 'undefined' && window.innerWidth <= 900) setCollapsed(true);
   }, []);
 
+  // Mobile (≤900px)-д iconrail+sidepanel нь overlay drawer — навигаци эсвэл
+  // backdrop дээр дарахад хаагдана. Desktop-д (grid) энэ нөлөөлөхгүй.
+  const closeMobileNav = () => {
+    if (typeof window !== 'undefined' && window.innerWidth <= 900) setCollapsed(true);
+  };
+
   if (!activeSystem) {
     return (
       <div className="shell2 shell2--loading" aria-busy="true">
@@ -323,6 +329,7 @@ export default function AppShell({ user, children }: Props) {
                     href={item.href}
                     className={`sidepanel__link${active ? ' is-active' : ''}`}
                     aria-current={active ? 'page' : undefined}
+                    onClick={closeMobileNav}
                   >
                     <Icon size={16} strokeWidth={2} />
                     <span>{T(item.labelKey)}</span>
@@ -350,6 +357,15 @@ export default function AppShell({ user, children }: Props) {
           <div className="main__inner">{children}</div>
         </main>
       </div>
+
+      {/* Mobile drawer backdrop — нээлттэй үед контентыг бүрхэж, дарахад хаана. */}
+      <button
+        type="button"
+        className="shell2__backdrop"
+        aria-label={T('shell.menu')}
+        tabIndex={-1}
+        onClick={() => setCollapsed(true)}
+      />
     </div>
   );
 }
