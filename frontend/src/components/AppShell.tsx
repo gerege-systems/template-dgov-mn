@@ -358,7 +358,7 @@ export default function AppShell({ user, children }: Props) {
         </main>
       </div>
 
-      {/* Mobile drawer backdrop — нээлттэй үед контентыг бүрхэж, дарахад хаана. */}
+      {/* Mobile drawer/bottom-sheet backdrop — нээлттэй үед контентыг бүрхэж, дарахад хаана. */}
       <button
         type="button"
         className="shell2__backdrop"
@@ -366,6 +366,35 @@ export default function AppShell({ user, children }: Props) {
         tabIndex={-1}
         onClick={() => setCollapsed(true)}
       />
+
+      {/* Mobile bottom tab bar — iconrail-ийг орлож ЗӨВХӨН системүүдийг харуулна.
+          Товшиход тухайн системийн хуудсууд доороос (bottom sheet) дэлгэгдэнэ;
+          идэвхтэй системээ дахин товшивол хаагдана. */}
+      <nav className="bottombar" aria-label={T('shell.menu')}>
+        {systems.map((s) => {
+          const Icon = s.icon;
+          const active = s.key === activeSystem.key;
+          return (
+            <button
+              key={s.key}
+              type="button"
+              className={`bottombar__tab${active ? ' is-active' : ''}`}
+              aria-label={T(s.labelKey)}
+              aria-current={active ? 'page' : undefined}
+              onClick={() => {
+                if (s.key === openKey && !collapsed) setCollapsed(true);
+                else {
+                  setOpenKey(s.key);
+                  setCollapsed(false);
+                }
+              }}
+            >
+              <Icon size={20} strokeWidth={2} />
+              <span>{T(s.labelKey)}</span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }

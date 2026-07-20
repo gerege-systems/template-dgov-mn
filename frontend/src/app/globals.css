@@ -1323,28 +1323,88 @@ html[lang="en"] .i18n-banner { display: block; }
 .spin { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ---------- Mobile bottom tab bar (систем сэлгэгч) ---------- */
+/* Desktop дээр нуугдана — зөвхөн ≤900px үед iconrail-ийг орлоно. */
+:root { --bottombar-h: 60px; }
+.bottombar { display: none; }
+.bottombar__tab {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 7px 4px;
+  transition: color 0.15s ease;
+}
+.bottombar__tab.is-active { color: var(--dan-blue); }
+.bottombar__tab svg { flex: 0 0 auto; }
+.bottombar__tab span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media (max-width: 900px) {
-  /* Mobile: maincol нь бүтэн өргөн; iconrail+sidepanel нь topbar-ийн hamburger-
-     ээр нээгддэг overlay drawer болно — контентыг шахахгүй, дээр нь гулсаж
-     гарна (өмнө нь grid шахагдаж topbar/цэс ашиглах боломжгүй болдог байсан). */
+  /* Mobile: maincol нь бүтэн өргөн; iconrail-ийг доод tab bar орлоно, sidepanel
+     нь идэвхтэй системийн хуудсуудыг доороос дэлгэдэг bottom sheet болно —
+     контентыг шахахгүй (өмнө нь grid шахагдаж контент харагдахгүй болдог байсан). */
   .shell2 { grid-template-columns: 1fr; }
   /* Хэвтээ гүйлгэлтээс сэргийлэх сүүлчийн хамгаалалт — дотоод гүйлгэдэг сав
-     (жишээ нь .users-table-wrap) өөрийн overflow-x-оор ажиллана. */
-  .maincol .main { overflow-x: clip; }
-  .iconrail,
+     (жишээ нь .users-table-wrap) өөрийн overflow-x-оор ажиллана. Доод tab bar-т
+     дарагдахгүйн тулд доор нь зай үлдээнэ. */
+  .maincol .main {
+    overflow-x: clip;
+    padding-bottom: calc(var(--bottombar-h) + env(safe-area-inset-bottom, 0px) + 28px);
+  }
+  .iconrail { display: none; }
+  .topbar2__toggle { display: none; }
+
+  /* sidepanel → доороос гулсдаг bottom sheet */
   .sidepanel {
     position: fixed;
-    top: 0;
-    bottom: 0;
-    z-index: 60;
-    transform: translateX(-100%);
+    left: 0;
+    right: 0;
+    top: auto;
+    width: auto;
+    bottom: calc(var(--bottombar-h) + env(safe-area-inset-bottom, 0px));
+    max-height: 68vh;
+    overflow-y: auto;
+    z-index: 65;
+    border-right: 0;
+    border-top: 1px solid var(--border);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.16);
+    transform: translateY(120%);
     transition: transform 0.24s ease;
   }
-  .iconrail { left: 0; width: 64px; }
-  .sidepanel { left: 64px; width: 232px; box-shadow: 8px 0 24px rgba(0, 0, 0, 0.12); }
-  .shell2:not(.is-collapsed) .iconrail,
-  .shell2:not(.is-collapsed) .sidepanel { transform: translateX(0); }
+  .shell2:not(.is-collapsed) .sidepanel { transform: translateY(0); }
   .shell2:not(.is-collapsed) .shell2__backdrop { display: block; }
+
+  /* доод tab bar — фиксэд, viewport-ийн доод ирмэгт */
+  .bottombar {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 70;
+    height: calc(var(--bottombar-h) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    align-items: stretch;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.05);
+  }
 }
 
 /* ---- AI туслахын чат (/me/ai) ---- */
