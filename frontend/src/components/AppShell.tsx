@@ -12,7 +12,7 @@ import {
   Plug,
   Gauge, Server, Crown, Palette,
   Landmark, Inbox, FileCheck, CalendarClock, Wallet, Bell,
-  CreditCard, Smartphone, FileSignature,
+  CreditCard, Smartphone, FileSignature, BookOpen,
 } from 'lucide-react';
 import UserMenu from './UserMenu';
 import NavSearch, { type SearchItem } from './NavSearch';
@@ -306,6 +306,9 @@ export default function AppShell({ user, children }: Props) {
           })}
         </nav>
         <div className="iconrail__bottom">
+          <a className="iconrail__btn" href="/docs/" target="_blank" rel="noreferrer" title={T('nav.docs')} aria-label={T('nav.docs')}>
+            <BookOpen size={20} strokeWidth={2} />
+          </a>
           <a className="iconrail__btn" href="https://dgov.mn/help" target="_blank" rel="noreferrer" title={T('nav.help')} aria-label={T('nav.help')}>
             <HelpCircle size={20} strokeWidth={2} />
           </a>
@@ -353,6 +356,10 @@ export default function AppShell({ user, children }: Props) {
           <div className="topbar2__spacer" />
           <NavSearch items={searchItems} placeholder={T('shell.search')} emptyText={lang === 'en' ? 'No results' : 'Илэрц алга'} />
           <div className="topbar2__actions">
+            <a className="topbar2__docs" href="/docs/" target="_blank" rel="noreferrer" title={T('nav.docs')} aria-label={T('nav.docs')}>
+              <BookOpen size={16} strokeWidth={2} />
+              <span>{T('nav.docs')}</span>
+            </a>
             <UserMenu username={displayName(user, lang)} email={user.email} initials={initialsOf(displayName(user, lang))} picture={user.picture} />
           </div>
         </header>
