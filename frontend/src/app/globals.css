@@ -853,8 +853,11 @@ html[lang="en"] .i18n-banner { display: block; }
 }
 .profile-card__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .profile-card__name { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.profile-card__name-text { font-family: var(--font-display); font-size: 18px; font-weight: 600; }
-.profile-card__sub { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.profile-card__name-text { font-family: var(--font-display); font-size: 18px; font-weight: 600; overflow-wrap: anywhere; }
+.profile-card__sub { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-width: 0; }
+/* Урт таслагдашгүй мөр (SSO имэйл sso_…@sso.local) mobile дээр хэвтээ гүйлгэлт
+   үүсгэхээс сэргийлж таслана. */
+.profile-card__sub .mono { overflow-wrap: anywhere; min-width: 0; }
 .profile-card__sub .dot::before { content: "·"; padding: 0 4px; color: var(--faint); }
 .profile-card__action { align-self: flex-start; }
 
@@ -1098,9 +1101,12 @@ html[lang="en"] .i18n-banner { display: block; }
   .field-row { grid-template-columns: 1fr; }
   .grid-2 { grid-template-columns: 1fr; }
   .card { padding: 20px; }
-  .profile-card { gap: 14px; }
+  /* avatar + нэр эхний мөрөнд, "Профайл харах" товч бүтэн өргөнтэй доор нь
+     буулгаж мобайл дээр эмх цэгцтэй харагдуулна. */
+  .profile-card { gap: 14px; flex-wrap: wrap; }
   .profile-card__avatar { width: 48px; height: 48px; font-size: 17px; border-radius: 12px; }
-  .profile-card__action { align-self: stretch; }
+  .profile-card__body { flex: 1 1 auto; }
+  .profile-card__action { flex: 1 1 100%; align-self: stretch; }
   .profile-card__action .btn { width: 100%; }
   .footer { flex-direction: column; align-items: flex-start; gap: 8px; }
   .signin-shell__nav { padding: 14px 20px; }
@@ -1322,6 +1328,9 @@ html[lang="en"] .i18n-banner { display: block; }
      ээр нээгддэг overlay drawer болно — контентыг шахахгүй, дээр нь гулсаж
      гарна (өмнө нь grid шахагдаж topbar/цэс ашиглах боломжгүй болдог байсан). */
   .shell2 { grid-template-columns: 1fr; }
+  /* Хэвтээ гүйлгэлтээс сэргийлэх сүүлчийн хамгаалалт — дотоод гүйлгэдэг сав
+     (жишээ нь .users-table-wrap) өөрийн overflow-x-оор ажиллана. */
+  .maincol .main { overflow-x: clip; }
   .iconrail,
   .sidepanel {
     position: fixed;
