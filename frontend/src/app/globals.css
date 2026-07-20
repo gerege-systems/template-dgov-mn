@@ -1697,6 +1697,32 @@ html[lang="en"] .i18n-banner { display: block; }
 .lp-nav__actions .segmented { background: oklch(100% 0 0 / 0.08); border-color: var(--lp-navy-line); }
 .lp-nav__actions .segmented__item { color: var(--lp-on-navy-70); }
 
+/* Mobile hamburger + dropdown цэс (<900px). ≥900px дээр inline links харагдана. */
+.lp-nav__burger {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; padding: 0; flex-shrink: 0;
+  color: var(--lp-on-navy); background: oklch(100% 0 0 / 0.06);
+  border: 1px solid var(--lp-navy-line); border-radius: 9px; cursor: pointer;
+  transition: background 0.14s ease;
+}
+.lp-nav__burger:hover { background: oklch(100% 0 0 / 0.12); }
+.lp-nav__mobile {
+  display: flex; flex-direction: column;
+  padding: 4px var(--lp-pad) 12px;
+  border-top: 1px solid var(--lp-navy-line);
+  background: var(--lp-header);
+}
+.lp-nav__mobile a {
+  padding: 13px 4px; font-size: 15px; font-weight: 500;
+  color: var(--lp-on-navy-70); text-decoration: none;
+  border-bottom: 1px solid var(--lp-navy-line);
+}
+.lp-nav__mobile a:last-child { border-bottom: 0; }
+.lp-nav__mobile a:hover { color: var(--lp-gold); }
+@media (min-width: 900px) {
+  .lp-nav__burger, .lp-nav__mobile { display: none; }
+}
+
 /* ---------- Hero ---------- */
 .lp-hero { position: relative; background: var(--lp-navy); overflow: hidden; }
 /* Утга бүхий hero чимэглэл (full-bleed) — hero-г бүтэн дүүргэнэ */

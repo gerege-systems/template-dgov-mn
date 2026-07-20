@@ -7,6 +7,7 @@ import {
   Fingerprint, Sparkles, ShieldCheck, Network, Waypoints, Users,
   Terminal, Layers, Bot, CheckCircle2, ArrowRight, ChevronRight,
   LogIn, Languages, KeyRound, ScrollText, Globe, Gauge, ShieldAlert,
+  Menu, X,
 } from 'lucide-react';
 import { useLang } from '@/lib/lang';
 import { landingCopy, type LandingCopy } from './copy';
@@ -34,6 +35,9 @@ interface Props {
  */
 export default function LandingPage({ next, themeLanding }: Props) {
   const { lang, setLang } = useLang();
+  // Mobile (<900px)-д хэсгүүдийн цэс inline харагдахгүй тул hamburger-ээр нээгдэх
+  // dropdown цэс.
+  const [menuOpen, setMenuOpen] = React.useState(false);
   // Идэвхтэй theme-ийн текст байвал copy.ts default дээр гүн merge хийнэ.
   const override = themeLanding?.[lang];
   const t = override ? deepMerge(landingCopy[lang], override) : landingCopy[lang];
@@ -74,8 +78,26 @@ export default function LandingPage({ next, themeLanding }: Props) {
               <LogIn size={16} strokeWidth={2} />
               <span>{t.nav.login}</span>
             </a>
+            <button
+              type="button"
+              className="lp-nav__burger"
+              aria-label={lang === 'en' ? 'Menu' : 'Цэс'}
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((o) => !o)}
+            >
+              {menuOpen ? <X size={20} strokeWidth={2} /> : <Menu size={20} strokeWidth={2} />}
+            </button>
           </div>
         </div>
+
+        {menuOpen && (
+          <nav className="lp-nav__mobile" aria-label="Хэсгүүд">
+            <a href="#features" onClick={() => setMenuOpen(false)}>{t.nav.features}</a>
+            <a href="#security" onClick={() => setMenuOpen(false)}>{t.nav.security}</a>
+            <a href="#tech" onClick={() => setMenuOpen(false)}>{t.nav.tech}</a>
+            <a href="/docs/" onClick={() => setMenuOpen(false)}>{t.nav.docs}</a>
+          </nav>
+        )}
       </header>
 
       <main id="top">
