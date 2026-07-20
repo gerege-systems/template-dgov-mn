@@ -1670,14 +1670,18 @@ html[lang="en"] .i18n-banner { display: block; }
   font-family: var(--font-display);
   font-weight: 700; font-size: 16px; letter-spacing: -0.01em;
   color: var(--lp-on-navy); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; min-width: 0;
 }
+/* Жижиг дэлгэц дээр урт брэнд нэрийг нуух (тугны лого хэвээр) — товчтой
+   давхцахаас сэргийлнэ. */
+@media (max-width: 560px) { .lp-nav__name { display: none; } }
 .lp-nav__links { display: none; align-items: center; gap: 30px; }
 .lp-nav__links a {
   font-size: 14.5px; font-weight: 500; color: var(--lp-on-navy-70);
   text-decoration: none; transition: color 0.14s ease;
 }
 .lp-nav__links a:hover { color: var(--lp-gold); }
-.lp-nav__actions { display: flex; align-items: center; gap: 12px; }
+.lp-nav__actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
 .lp-lang {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 7px 11px;
