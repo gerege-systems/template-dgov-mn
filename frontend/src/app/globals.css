@@ -716,6 +716,21 @@ html[lang="en"] .i18n-banner { display: block; }
 .dlg-title { font-size: 17px; font-weight: 700; color: var(--fg); margin: 0; }
 .dlg-desc { font-size: 13px; color: var(--muted); margin: 0; }
 
+/* Popup/modal mobile дээр — гар утсанд бараг бүтэн өргөнтэй, дээрээсээ эхэлж
+   (төвд байрлуулбал өндөр контент дээд талаараа тасардаг), урт форм overlay
+   дотроо гүйлгэгдэнэ. Хаах X товч томроод хүрэхэд амар болно. */
+@media (max-width: 640px) {
+  .dlg-overlay { align-items: flex-start; padding: 12px; }
+  .dlg-content {
+    max-width: none;
+    border-radius: 16px;
+    padding: 20px;
+    /* overlay-д доод зай + iOS safe-area */
+    margin-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+  .dlg-close { width: 34px; height: 34px; top: 12px; right: 12px; }
+}
+
 /* ---------- Form ---------- */
 
 .form-grid { display: grid; gap: 16px; }
@@ -1303,35 +1318,51 @@ html[lang="en"] .i18n-banner { display: block; }
 .rbac-perm-label small { color: var(--faint); font-size: 11px; }
 
 /* ---------- Responsive tables ---------- */
-/* Бүх хүснэгт өөрийн саван дотор (.users-table-wrap эсвэл overflowX:auto .card)
-   хэвтээ гүйлгэгддэг. Mobile дээр багануудыг битүү шахаж (текст эвдрэн мөр
-   таслахаас) сэргийлж nowrap хийж, savandaa цэвэр гүйлгэгдэнэ — ирмэг дээр
-   хагас харагдах багана "баруун тийш гүйлгэ" гэсэн дохио болно. */
+/* >640px: хүснэгт өөрийн саван дотор (.users-table-wrap / overflowX:auto .card)
+   хэвтээ гүйлгэгдэнэ. dtable (eID) болон rbac-matrix нь энэ горимоор үлдэнэ. */
 .users-table-wrap { -webkit-overflow-scrolling: touch; }
 
-@media (max-width: 720px) {
-  .users-table,
-  .dtable,
-  .rbac-matrix { font-size: 13px; }
-
-  .users-table th,
-  .users-table td,
-  .dtable thead th,
-  .dtable tbody td,
-  .rbac-matrix th,
-  .rbac-matrix td {
-    padding: 9px 11px;
-    white-space: nowrap;
+/* ---- Хүснэгт mobile дээр — мөр бүр "шошго: утга" хосуудын карт болно ----
+   Багана олонтой хүснэгтийг хэвтээ гүйлгэхийн оронд босоо задлана. Шошгыг
+   `td[data-label]`-ээс уншина (толгойн нүдтэй ижил текст) — тиймээс шинэ
+   хүснэгт нэмэхдээ td бүрд data-label өгнө. Үйлдлийн багана нь data-label-гүй
+   (эсвэл хоосон) тул шошгогүй, бүтэн өргөнтэй мөр болно. */
+@media (max-width: 640px) {
+  .users-table-wrap { overflow-x: visible; }
+  .users-table, .users-table tbody, .users-table tr, .users-table td { display: block; width: 100%; }
+  /* Толгойг зөвхөн нүдээр нуух — дэлгэц уншигчид хэвээр хүртээмжтэй. */
+  .users-table thead {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
   }
-
-  /* Урт чөлөөт текст (лог мессеж, дэлгэрэнгүй) — хэт өргөсгөхгүйгээр таслуулах.
-     Тухайн td-д className="cell-wrap" өгвөл мөр таслаж, дээд хязгаартай болно. */
-  .users-table td.cell-wrap,
-  .dtable tbody td.cell-wrap {
-    white-space: normal;
-    min-width: 200px;
-    max-width: 260px;
+  .users-table tr { padding: 12px 2px; border-bottom: 1px solid var(--border); }
+  .users-table tbody tr:last-child { border-bottom: 0; }
+  .users-table td {
+    display: grid;
+    grid-template-columns: minmax(84px, 38%) 1fr;
+    gap: 10px;
+    align-items: baseline;
+    /* badge/chip нь баганаа дүүргэж сунахаас сэргийлнэ. */
+    justify-items: start;
+    padding: 6px 14px;
+    border-bottom: 0;
   }
+  .users-table td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 11.5px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .03em;
+    overflow-wrap: anywhere;
+  }
+  /* Шошгогүй нүд (үйлдлийн багана) — бүтэн өргөн, зүүн тийш эгнэнэ. */
+  .users-table td:not([data-label]),
+  .users-table td[data-label=""] { display: block; }
+  .users-table td:not([data-label])::before,
+  .users-table td[data-label=""]::before { content: none; }
+  .users-table__actions { text-align: left; white-space: normal; padding-top: 10px; }
+  /* Урт таслагдашгүй утга (client_id, имэйл) мөрийг тэлэхээс сэргийлнэ. */
+  .users-table td .mono, .users-table td code { overflow-wrap: anywhere; }
 }
 
 .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 22px; }
@@ -1405,28 +1436,31 @@ html[lang="en"] .i18n-banner { display: block; }
   /* зүүн дээд булангийн hamburger — идэвхтэй системийн хуудсын цэсийг нээнэ.
      (base дээр аль хэдийн display:flex — desktop-т grid баганыг toggle-дэнэ.) */
 
-  /* sidepanel → зүүн талаас гулсдаг drawer (hamburger-ээр нээгдэнэ).
-     Bottom sheet биш — доод tab bar болон backdrop-оос дээр байрлана. */
+  /* sidepanel → зүүн дээд буланд байрлах ☰ (topbar2__toggle)-оор нээгддэг зүүн
+     талын drawer. Доод tab bar-ыг бүрхэхгүйн тулд доороосоо түүний өндрөөр
+     тасарна. */
   .sidepanel {
     position: fixed;
     top: 0;
-    bottom: 0;
     left: 0;
     right: auto;
-    width: min(280px, 82vw);
-    max-height: none;
+    bottom: auto;
+    /* Доод tab bar-аас дээш дүүрэн өндөр. base rule-ийн height:100vh-г дарж
+       бичнэ; top+bottom-оор сунгах нь grid item-ийн align-self:start-аас болж
+       ажиллахгүй тул өндрийг шууд тооцно. dvh нь mobile хаягийн мөрийг тооцно. */
+    height: calc(100vh - var(--bottombar-h) - env(safe-area-inset-bottom, 0px));
+    height: calc(100dvh - var(--bottombar-h) - env(safe-area-inset-bottom, 0px));
+    width: min(80vw, 288px);
     overflow-y: auto;
-    z-index: 85;
+    z-index: 65;
     border-right: 1px solid var(--border);
     border-top: 0;
     border-radius: 0;
-    box-shadow: 8px 0 28px rgba(0, 0, 0, 0.18);
+    box-shadow: 8px 0 28px rgba(0, 0, 0, 0.16);
     transform: translateX(-100%);
     transition: transform 0.24s ease;
   }
   .shell2:not(.is-collapsed) .sidepanel { transform: translateX(0); }
-  /* backdrop нь доод tab bar-аас дээр (доод bar-ыг ч бүрхэнэ) */
-  .shell2__backdrop { z-index: 80; }
   .shell2:not(.is-collapsed) .shell2__backdrop { display: block; }
 
   /* доод tab bar — фиксэд, viewport-ийн доод ирмэгт */
