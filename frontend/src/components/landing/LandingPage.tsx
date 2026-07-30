@@ -17,14 +17,20 @@ import { brand as brandConfig } from '@/brand.config';
 
 // Нүүрэн дээрх хэлний товч нь mn → en → zh → ru → mn гэж эргэлдэнэ (дараагийн
 // хэлийг шошгонд харуулна).
-const NEXT_LANG: Record<Lang, Lang> = { mn: 'en', en: 'zh', zh: 'ru', ru: 'mn' };
-const LANG_SHORT: Record<Lang, string> = { mn: 'МН', en: 'EN', zh: '中文', ru: 'RU' };
+// Landing-ийн МАРКЕТИНГИЙН текст ямар хэлтэй вэ — `copy.ts`-тэй нэг эх
+// сурвалж. Интерфэйс нь долоон хэлтэй (Монгол + НҮБ-ийн 6) ч энэ текстийг
+// хүн бичдэг тул 4 хэлтэй.
+const LANDING_LANGS = ['mn', 'en', 'zh', 'ru'] as const;
+type LandingLang = (typeof LANDING_LANGS)[number];
+
+const NEXT_LANG: Record<LandingLang, LandingLang> = { mn: 'en', en: 'zh', zh: 'ru', ru: 'mn' };
+const LANG_SHORT: Record<LandingLang, string> = { mn: 'МН', en: 'EN', zh: '中文', ru: 'RU' };
 
 // Дараагийн хэл рүү шилжих (нүүрний хоёр товчлуурт сонгогч). Landing нь зөвхөн
 // багцлагдсан хэлээр тексттэй тул DB-ээс нэмэгдсэн хэл дээр байхад англиас
 // эргэлт эхэлнэ.
-function nextLang(current: LangCode): Lang {
-  return NEXT_LANG[current as Lang] ?? 'en';
+function nextLang(current: LangCode): LandingLang {
+  return NEXT_LANG[current as LandingLang] ?? 'en';
 }
 
 // Нээлттэй эх (Open Source) кодын GitHub репозитор.
@@ -51,12 +57,7 @@ interface Props {
   googleLink?: boolean;
   googleError?: boolean;
   /** Идэвхтэй theme-ийн landing текст/цэс (mn/en/zh/ru) — copy.ts default дээр давхарлана. */
-  themeLanding?: {
-    mn?: Partial<LandingCopy>;
-    en?: Partial<LandingCopy>;
-    zh?: Partial<LandingCopy>;
-    ru?: Partial<LandingCopy>;
-  };
+  themeLanding?: Partial<Record<LandingLang, Partial<LandingCopy>>>;
 }
 
 /**
@@ -74,7 +75,7 @@ export default function LandingPage({ next, themeLanding }: Props) {
   // Идэвхтэй theme-ийн текст байвал copy.ts default дээр гүн merge хийнэ.
   // Landing copy нь багцлагдсан дөрвөн хэлтэй; DB-ээс нэмэгдсэн хэлэнд англи
   // руу уналт хийнэ (landingCopyFor). Theme-ийн текст override мөн адил.
-  const override = themeLanding?.[lang as Lang];
+  const override = themeLanding?.[lang as LandingLang];
   const base = landingCopyFor(lang);
   const t = override ? deepMerge(base, override) : base;
   const brand = t.brand || brandConfig.name;

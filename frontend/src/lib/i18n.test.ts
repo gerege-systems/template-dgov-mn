@@ -42,11 +42,16 @@ describe('i18n dictionary parity', () => {
   });
 });
 
+// Landing нь МАРКЕТИНГИЙН текст — интерфэйсийн долоон хэлээс ЦӨӨН хэлтэй
+// (`copy.ts`-тэй нэг эх сурвалж). Дундын толийг долоогоор нь, landing-ийг
+// өөрийнхөөрөө шалгана.
+const LANDING_LANGS = ['mn', 'en', 'zh', 'ru'] as const;
+
 describe('landing copy parity', () => {
   const mnPaths = leafPaths(landingCopy.mn).sort();
 
   it('every language has the same landing copy shape', () => {
-    for (const lang of LANGS) {
+    for (const lang of LANDING_LANGS) {
       const paths = leafPaths(landingCopy[lang]).sort();
       expect(paths, `${lang} landing copy-ийн бүтэц зөрж байна`).toEqual(mnPaths);
     }
