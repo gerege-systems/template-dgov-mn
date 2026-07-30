@@ -475,7 +475,13 @@ const ru: LandingCopy = {
   },
 };
 
-export const landingCopy: Record<Lang, LandingCopy> = { mn, en, zh, ru };
+/**
+ * Landing-ийн МАРКЕТИНГИЙН текст.
+ *
+ * ХЭСЭГЧЛЭН: интерфэйс нь Монгол + НҮБ-ийн 6 хэлтэй ч энэ текстийг хүн бичдэг
+ * тул 4 хэлтэй. Дутуу хэлэнд `landingCopyFor` англи руу уналт хийнэ.
+ */
+export const landingCopy: Partial<Record<Lang, LandingCopy>> = { mn, en, zh, ru };
 
 /**
  * Landing-ийн текстийг хэлээр авна. Landing copy нь кодод БАГЦЛАГДСАН
@@ -483,5 +489,5 @@ export const landingCopy: Record<Lang, LandingCopy> = { mn, en, zh, ru };
  * англи руу уналт хийнэ — нүүр хуудас хэзээ ч хоосон болохгүй.
  */
 export function landingCopyFor(lang: LangCode): LandingCopy {
-  return landingCopy[lang as Lang] ?? landingCopy.en;
+  return landingCopy[lang as Lang] ?? en;
 }
