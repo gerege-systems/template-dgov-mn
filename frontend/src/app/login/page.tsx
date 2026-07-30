@@ -4,13 +4,16 @@ import React from 'react';
 import { LogIn } from 'lucide-react';
 import SigninShell from '@gerege/ui-core/components/SigninShell';
 import { safeNext } from '@gerege/ui-core/lib/navigation';
+import { fetchAuthMode, ssoHostName } from '@gerege/ui-core/lib/authMode';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata = { title: pageTitle('Нэвтрэх') };
 
-// Нэвтрэлт нь Gerege SSO (sso.gerege.mn)-оор дамжина. Товч дарахад sso.gerege.mn
-// руу шилжиж, тэндээ нэвтэрч, буцаж ирнэ (OIDC RP урсгал). SSO callback амжилтгүй
+// Нэвтрэлт нь ДЭЭД SSO-оор дамжина (OIDC RP урсгал): товч дарахад тэр рүү
+// шилжиж, нэвтэрч, буцаж ирнэ. Аль SSO болохыг backend-ийн `SSO_ISSUER`
+// шийднэ — dgov урсгалын платформ sso.dgov.mn, Gerege урсгалынх
+// sso.gerege.mn руу очно. Иймд хостыг кодод бичихгүй, тохиргооноос уншина. SSO callback амжилтгүй
 // бол энд ?error=sso-тэй буцаж, дахин оролдох боломж өгнө.
 export default async function LoginPage(props: {
   searchParams: Promise<{ next?: string; error?: string }>;
@@ -19,6 +22,8 @@ export default async function LoginPage(props: {
   const next = safeNext(searchParams.next);
   const ssoHref = `/api/auth/sso/start${next && next !== '/' ? `?next=${encodeURIComponent(next)}` : ''}`;
   const failed = searchParams.error === 'sso';
+  // Backend-ийн AUTH_MODE/SSO_ISSUER-оос. Уншигдахгүй бол ерөнхий үг үзүүлнэ.
+  const ssoHost = ssoHostName(await fetchAuthMode());
 
   return (
     <SigninShell>
@@ -29,7 +34,9 @@ export default async function LoginPage(props: {
       >
         <div>
           <h1 id="login-title" style={{ margin: '0 0 0.4rem' }}>Нэвтрэх</h1>
-          <p style={{ margin: 0, opacity: 0.7 }}>Gerege SSO (sso.gerege.mn)-оор нэвтэрнэ үү.</p>
+          <p style={{ margin: 0, opacity: 0.7 }}>
+            {ssoHost ? `${ssoHost}-аар нэвтэрнэ үү.` : 'Нэгдсэн нэвтрэлтээр нэвтэрнэ үү.'}
+          </p>
         </div>
 
         {failed && (
@@ -54,7 +61,7 @@ export default async function LoginPage(props: {
           style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
         >
           <LogIn size={18} strokeWidth={2} />
-          <span>Gerege SSO-оор нэвтрэх</span>
+          <span>{ssoHost ? `${ssoHost}-аар нэвтрэх` : 'Нэгдсэн нэвтрэлтээр нэвтрэх'}</span>
         </a>
       </section>
     </SigninShell>
