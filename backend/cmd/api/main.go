@@ -1,14 +1,14 @@
 // Package main нь Government Template Platform-ын API эхлэх цэг.
 //
 // Бүх суурь чадвар (танилт, RBAC, API gateway, OIDC provider, eID proxy,
-// AI pipeline) нь github.com/gerege-systems/public-gerege-core модульд байрлана.
+// AI pipeline) нь github.com/gerege-systems/open-gerege-core модульд байрлана.
 // Энэ апп нь зөвхөн өөрийн онцлогийг нэмнэ.
 package main
 
 import (
-	"github.com/gerege-systems/public-gerege-core/cmd/api/server"
-	"github.com/gerege-systems/public-gerege-core/core/constants"
-	"github.com/gerege-systems/public-gerege-core/pkg/logger"
+	"github.com/gerege-systems/open-gerege-core/cmd/api/server"
+	"github.com/gerege-systems/open-gerege-core/core/constants"
+	"github.com/gerege-systems/open-gerege-core/pkg/logger"
 )
 
 func main() {
