@@ -24,7 +24,7 @@
     "@gerege/ui-core": "https://github.com/gerege-systems/ui-core/archive/refs/tags/v0.11.3.tar.gz"
   },
   "devDependencies": {
-    "@types/node": "20.11.30",
+    "@types/node": "26.1.2",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "eslint": "^10.8.0",
