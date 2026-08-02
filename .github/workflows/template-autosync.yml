@@ -1,11 +1,11 @@
-# public-gerege-template → template-dgov-mn автомат удамшил.
+# open-gerege-mn → template-dgov-mn автомат удамшил.
 #
 # Нээлттэй суурь template-д өөрчлөлт орох бүрд энэ ажил түүнийг татаж `main`
 # руу merge хийнэ. Зөрүүтэй файлууд (`.gitattributes` дахь `merge=ours`)
 # автоматаар манайх хэвээр үлдэнэ, иймд ердийн тохиолдолд conflict гарахгүй.
 #
 # Энэ бол ТЕМПLATE давхарга — gov урсгалын бүх апп эндээс удамшдаг тул
-# хоцрохгүй байх нь чухал. Иймд `private-gerege-template`-тэй адилаар merge-ийг
+# хоцрохгүй байх нь чухал. Иймд `template-gerege-mn`-тэй адилаар merge-ийг
 # `main` руу ШУУД оруулна (апп-ууд дээр PR болж хүний хяналтад очно).
 #
 # Conflict гарвал: merge-ийг цуцалж, issue үүсгэн хүнийг дуудна — чимээгүй
@@ -42,7 +42,7 @@ jobs:
           git config user.email 'gerege-template-autosync@users.noreply.github.com'
           # .gitattributes дахь `merge=ours`-ийг ажиллуулна.
           git config merge.ours.driver true
-          git remote add upstream https://github.com/gerege-systems/public-gerege-template.git
+          git remote add upstream https://github.com/gerege-systems/open-gerege-mn.git
           git fetch upstream main
 
       - name: Шинэ commit байгаа эсэх
@@ -117,9 +117,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          body=$'`public-gerege-template`-аас автомат merge хийх үед conflict гарлаа.\n\n**Зөрчилтэй файлууд:**\n```\n'
+          body=$'`open-gerege-mn`-аас автомат merge хийх үед conflict гарлаа.\n\n**Зөрчилтэй файлууд:**\n```\n'
           body+="$(cat /tmp/conflicts.txt)"
-          body+=$'\n```\n\nГараар шийдэх:\n```bash\ngit remote add upstream https://github.com/gerege-systems/public-gerege-template.git\ngit fetch upstream main\ngit config merge.ours.driver true\ngit merge upstream/main\n```\n\nХэрэв зөрүү нь зориудынх бол `.gitattributes`-д `merge=ours` нэмнэ.'
+          body+=$'\n```\n\nГараар шийдэх:\n```bash\ngit remote add upstream https://github.com/gerege-systems/open-gerege-mn.git\ngit fetch upstream main\ngit config merge.ours.driver true\ngit merge upstream/main\n```\n\nХэрэв зөрүү нь зориудынх бол `.gitattributes`-д `merge=ours` нэмнэ.'
           gh issue create --repo "$GITHUB_REPOSITORY" --title "template-autosync: upstream merge conflict" --body "$body" --label autosync 2>/dev/null \
             || gh issue create --repo "$GITHUB_REPOSITORY" --title "template-autosync: upstream merge conflict" --body "$body"
 
@@ -127,6 +127,6 @@ jobs:
         if: always()
         run: |
           echo "### template-autosync" >> "$GITHUB_STEP_SUMMARY"
-          echo "- upstream: \`public-gerege-template\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- upstream: \`open-gerege-mn\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- хоцорсон commit: ${{ steps.check.outputs.n }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- merge: ${{ steps.merge.outputs.ok || 'хийх зүйлгүй' }}" >> "$GITHUB_STEP_SUMMARY"

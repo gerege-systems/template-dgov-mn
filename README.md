@@ -33,15 +33,15 @@ SQL-тэй [jackc/pgx](https://github.com/jackc/pgx) драйвертэй хос
 Энэ репо флотын удамшлын мод дотор дараах байрлалтай:
 
 ```
-public-gerege-template
+open-gerege-mn
    └─► template-dgov-mn          ← ЭНЭ РЕПО
           └─► ring-dgov-mn · hurdan-dgov-mn · developer-dgov-mn · sso-dgov-mn
 ```
 
 | Юу удамшдаг | Хаанаас | Механизм |
 |---|---|---|
-| Template код (frontend · backend · deploy) | `public-gerege-template` | `git merge` → шууд `main` — өдөр бүр [`template-autosync`](.github/workflows/template-autosync.yml) |
-| Go цөм | `public-gerege-core v1.0.0` | `backend/go.mod` |
+| Template код (frontend · backend · deploy) | `open-gerege-mn` | `git merge` → шууд `main` — өдөр бүр [`template-autosync`](.github/workflows/template-autosync.yml) |
+| Go цөм | `open-gerege-core v1.0.0` | `backend/go.mod` |
 | Frontend бүрэлдэхүүн | `@gerege/ui-core v0.4.0` | `frontend/package.json` (HTTPS tarball) |
 
 **Энэ репогийн өөрийнх — удамшдаггүй:**
